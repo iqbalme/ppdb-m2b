@@ -10,8 +10,8 @@
     <!-- Styles -->
     <!-- <link href="{{ asset('css/app.css') }}" rel="stylesheet"> -->
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ url('/public/uploads/favicon.png') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url('/public/uploads/favicon.png') }}" type="image/x-icon">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-165860826-2"></script>
     <script>
         window.dataLayer = window.dataLayer || [];

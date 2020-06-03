@@ -4,17 +4,25 @@
         <div class="row">
             <div class="col-md">
                 <card>
-                    <h4 slot="header" class="card-title">Edit Informasi</h4>
-						<div class="row">
-                            <div class="col-md-12">
-                                <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-fill float-right ml-3" @click.prevent="submitInfo">SIMPAN</button>
-                            <button class="btn btn-danger btn-fill float-right" @click.prevent="emptyEditor">RESET</button>
-                        </div>
-                        <div class="clearfix"></div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="alert alert-primary text-center" style="font-size:1.5rem;font-weight:bold">
+								EDIT INFORMASI
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+						</div>
+					</div>
+					<div style="margin-top: 10px;">
+						<div class="text-center">
+							<button type="submit" class="btn btn-primary btn-fill float-right ml-3" @click.prevent="simpanInfo">SIMPAN</button>
+							<button class="btn btn-danger btn-fill float-right" @click.prevent="emptyEditor">RESET</button>
+						</div>
+					</div>
+					<div class="clearfix"></div>
                 </card>
             </div>
         </div>
@@ -24,6 +32,7 @@
 
 <script>
 import Card from "./../themeComponents/Cards/Card.vue";
+import Swal from 'sweetalert2'
 
 // import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor';
@@ -64,6 +73,7 @@ import Autoformat from '@ckeditor/ckeditor5-autoformat/src/autoformat';
 import Indent from '@ckeditor/ckeditor5-indent/src/indent';
 import IndentBlock from '@ckeditor/ckeditor5-indent/src/indentblock';
 import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
+import $axios from '../../api.js';
 
 export default {
     components: {
@@ -245,10 +255,10 @@ export default {
             }
         };
     },
+	created(){
+		this.getInfo();
+	},
     methods: {
-        submitInfo() {
-			//di sini axios edit info
-        },
         emptyEditor() {
             this.editorData = '';
         },
@@ -269,7 +279,39 @@ export default {
         },
         onFileUploadResponse(evt) {
             console.log(evt);
-        }
+        },
+		getInfo() {
+		  $axios.get('/informasi')
+			.then((response)=> {
+				var data = response.data;
+				if(data.status == 'success'){
+					this.editorData = data.data.informasi;
+				}
+			});
+		},
+		simpanInfo() {
+			$axios.post('/informasi', {
+				informasi: this.editorData
+			})
+			.then((response)=> {
+			  var data = response.data;
+			  if(data.status == 'success'){
+				  this.swalBox('Berhasil', 'Data telah tersimpan!', 'success');
+			  } else {
+				  this.swalBox('Gagal', 'Data gagal tersimpan, silakan coba lagi!', 'warning');
+			  }
+			})
+			.catch(error => {
+			  this.swalBox('Gagal', 'Data gagal tersimpan, silakan coba lagi!', 'warning');
+			});
+		},
+		swalBox(header, msg, icon){
+			Swal.fire(
+			  header,
+			  msg,
+			  icon
+			)
+		}
     }
 };
 </script>

@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 //IMPORT MODULE SECTION
 import auth from './stores/auth.js'
+import moment from 'moment';
 
 Vue.use(Vuex)
 
@@ -16,7 +17,12 @@ const store = new Vuex.Store({
     state: {
         //VARIABLE TOKEN MENGAMBIL VALUE DARI LOCAL STORAGE token
         token: localStorage.getItem('token'),
-        errors: []
+        errors: [],
+		registrationStatus: 'running',
+		waktu: {
+			// mulai: null,
+			// akhir: null
+		}
     },
     getters: {
         //KITA MEMBUAT SEBUAH GETTERS DENGAN NAMA isAuth
@@ -36,7 +42,13 @@ const store = new Vuex.Store({
         },
         CLEAR_ERRORS(state) {
             state.errors = []
-        }
+        },
+		SET_REG_STATUS(state, payload) {
+            state.registrationStatus = payload
+        },
+		SET_WAKTU(state, payload) {
+            state.waktu = payload
+        },
     }
 })
 

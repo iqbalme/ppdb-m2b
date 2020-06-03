@@ -3,6 +3,13 @@
 		<card>
 		<div class="row">
 			<div class="col-md-12">
+				<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+					Data Diri
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
 				<base-input type="text" label="Nama Lengkap" v-model="siswa.nama_lengkap" :validatedClass="$v.siswa.nama_lengkap.$error"></base-input>
 			</div>
 		</div>
@@ -138,6 +145,7 @@ import { required, minLength, maxLength, numeric, maxValue } from 'vuelidate/lib
 import V_Pikaday from 'vue-pikaday-directive';
 import { tanggal, maxValueAnakKe } from './../../../customValidator';
 import { dateOption } from './../../../datePickerSetting';
+import $axios from '../../../api.js';
 
 export default {
 	name: "regis-data-diri",
@@ -286,8 +294,8 @@ export default {
 		},
 		getTransportasi() {
 			if(this.options.list_transportasi.length == 0){
-			  axios
-				.get('/api/transportasi')
+			  $axios
+				.get('/transportasi')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_transportasi = [];
@@ -299,14 +307,14 @@ export default {
 				  }
 				})
 				.catch(error => {
-				  console.log(error);
+				  //console.log(error);
 				});
 			}
 		},
 		getJarak() {
 			if(this.options.list_jarak.length == 0){
-			  axios
-				.get('/api/jarak')
+			  $axios
+				.get('/jarak')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_jarak = [];
@@ -324,8 +332,8 @@ export default {
 		},
 		getHobi() {
 			if(this.options.list_hobi.length == 0){
-			  axios
-				.get('/api/hobi')
+			  $axios
+				.get('/hobi')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_hobi = [];
@@ -343,8 +351,8 @@ export default {
 		},
 		getCita() {
 			if(this.options.list_cita_cita.length == 0){
-			  axios
-				.get('/api/cita_cita')
+			  $axios
+				.get('/cita_cita')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_cita_cita = [];
@@ -362,8 +370,8 @@ export default {
 		},
 		getAgama() {
 			if(this.options.list_agama.length == 0){
-			  axios
-				.get('/api/agama')
+			  $axios
+				.get('/agama')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_agama = [];
@@ -381,8 +389,8 @@ export default {
 		},
 		getPropinsi() {
 			if(this.options.list_propinsi.length == 0){
-			  axios
-				.get('/api/propinsi')
+			  $axios
+				.get('/propinsi')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_propinsi = [];
@@ -399,8 +407,8 @@ export default {
 			}
 		},
 		getKabupaten(id) {
-		  axios
-			.get('/api/kabupaten/'+id)
+		  $axios
+			.get('/kabupaten/'+id)
 			.then((response)=> {
 			  var items = response.data;
 			  this.options.list_kabupaten = [];
@@ -416,8 +424,8 @@ export default {
 			});
 		},
 		getKecamatan(id) {
-		  axios
-			.get('/api/kecamatan/'+id)
+		  $axios
+			.get('/kecamatan/'+id)
 			.then((response)=> {
 			  var items = response.data;
 			  this.options.list_kecamatan = [];
@@ -433,8 +441,8 @@ export default {
 			});
 		},
 		getKelurahan(id) {
-		  axios
-			.get('/api/kelurahan/'+id)
+		  $axios
+			.get('/kelurahan/'+id)
 			.then((response)=> {
 			  var items = response.data;
 			  this.options.list_kelurahan = [];
@@ -451,8 +459,8 @@ export default {
 		},
 		getJenisTinggal(id) {
 			if(this.options.list_jenis_tinggal.length == 0){
-			  axios
-				.get('/api/jenis_tinggal')
+			  $axios
+				.get('/jenis_tinggal')
 				.then((response)=> {
 				  var items = response.data;
 				  this.options.list_jenis_tinggal = [];

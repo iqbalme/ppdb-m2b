@@ -22,5 +22,7 @@
 
 </script>
 <style>
-
+	.footer {
+		background-color: #000000;
+	}
 </style>

@@ -11,6 +11,6 @@ class Hobi extends Model
     protected $fillable = ['hobi'];
 
     public function pendaftar(){
-        return $this->belongsTo('App\Pendaftar')->withDefault();
+        return $this->hasOne('App\Pendaftar');
     }
 }

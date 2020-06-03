@@ -37,6 +37,8 @@ class CreateTDataPendaftar extends Migration
             $table->string('nama_ayah');
             $table->string('nik_ayah');
             $table->string('no_hp_ayah')->nullable();
+			$table->bigInteger('agama_ayah_id')->unsigned();
+            $table->foreign('agama_ayah_id')->on('t_agama')->references('id')->delete('cascade');
             $table->bigInteger('pekerjaan_ayah_id')->unsigned();
             $table->foreign('pekerjaan_ayah_id')->on('t_pekerjaan')->references('id')->delete('cascade');
             $table->bigInteger('pendidikan_ayah_id')->unsigned();
@@ -44,6 +46,8 @@ class CreateTDataPendaftar extends Migration
             $table->string('nama_ibu_kandung');
             $table->string('nik_ibu_kandung');
             $table->string('no_hp_ibu_kandung')->nullable();
+			$table->bigInteger('agama_ibu_id')->unsigned();
+            $table->foreign('agama_ibu_id')->on('t_agama')->references('id')->delete('cascade');
             $table->bigInteger('pekerjaan_ibu_id')->unsigned();
             $table->foreign('pekerjaan_ibu_id')->on('t_pekerjaan')->references('id')->delete('cascade');
             $table->bigInteger('pendidikan_ibu_id')->unsigned();
@@ -57,7 +61,9 @@ class CreateTDataPendaftar extends Migration
             $table->foreign('pekerjaan_wali_id')->on('t_pekerjaan')->references('id')->delete('cascade');
             $table->bigInteger('pendidikan_wali_id')->unsigned();
             $table->foreign('pendidikan_wali_id')->on('t_pendidikan')->references('id')->delete('cascade');
-            $table->bigInteger('hubungan_wali_id')->unsigned();
+            $table->bigInteger('agama_wali_id')->unsigned();
+            $table->foreign('agama_wali_id')->on('t_agama')->references('id')->delete('cascade');
+			$table->bigInteger('hubungan_wali_id')->unsigned();
             $table->foreign('hubungan_wali_id')->on('t_hubungan')->references('id')->delete('cascade');
             $table->string('no_hp_wali')->nullable();
             $table->longText('alamat_ortu_wali');

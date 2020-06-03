@@ -2,6 +2,13 @@
 <div>
 	<card>
 		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+					Nilai dan Prestasi
+				</div>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-md-6">
 				<base-input type="text" label="No peserta UN" placeholder="" v-model="nilai.no_peserta_un" maxLength="16":validatedClass="$v.nilai.no_peserta_un.$error"></base-input>
 			</div>
@@ -180,6 +187,7 @@ import V_Pikaday from 'vue-pikaday-directive';
 import LTable from './../../themeComponents/Table.vue';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2';
+import $axios from '../../../api.js';
 
 export default {
 	name: "regis-data-nilai",
@@ -249,7 +257,6 @@ export default {
 				maxLength: maxLength(16)
 			},
 			total_nilai_un: {
-				required,
 				numeric,
 				maxValue: maxValue(100)
 			},
@@ -412,7 +419,7 @@ export default {
 		},
 		getMapel() {
 			if(this.nilai.nilai_akademik.length == 0){
-			  axios.get('/api/mapel')
+			  $axios.get('/mapel')
 				.then((response)=> {
 				  var items = response.data;
 				  this.nilai.nilai_akademik = [];

@@ -11,6 +11,6 @@ class CitaCita extends Model
     protected $fillable = ['cita_cita'];
 
     public function pendaftar(){
-        return $this->belongsTo('App\Pendaftar')->withDefault();
+        return $this->hasOne('App\Pendaftar')->withDefault();
     }
 }

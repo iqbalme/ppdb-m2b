@@ -24,6 +24,7 @@ import CKEditor from '@ckeditor/ckeditor5-vue'
 import VueRouter from 'vue-router'
 import Vuelidate from 'vuelidate' //IMPORT LIBRARY
 import store from './store.js'
+//import $axios from './api.js'
 
 import App from './App.vue'
 // LightBootstrap plugin

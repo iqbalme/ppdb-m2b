@@ -18,7 +18,8 @@ class CreateTStatusPendaftar extends Migration
             $table->bigInteger('pendaftar_id')->unsigned();
             $table->foreign('pendaftar_id')->on('t_pendaftar')->references('id')->delete('cascade');
 			$table->string('noRegistrasi')->unique();
-            $table->enum('status', ['aktif', 'non aktif'])->default('non aktif');
+			$table->string('pin', 5);
+            $table->enum('status', [1, 2, 3, 4])->default('1')->comment('1: terdaftar online, 2: terverifikasi, 3: lulus, 4: tidak lulus');
         });
     }
 

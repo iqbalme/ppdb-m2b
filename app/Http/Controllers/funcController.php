@@ -5,17 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Agama;
 use App\Hobi;
+use App\Kelas;
 use App\CitaCita;
 use App\JenisTinggal;
 use App\Transportasi;
 use App\Jarak;
 use App\Pekerjaan;
+use App\PendaftarKelas;
 use App\Pendidikan;
 use App\Penghasilan;
 use App\Hubungan;
 use App\Wilayah;
 use App\Mapel;
+use App\Info;
+use App\JadwalPpdb;
+use App\Pendaftar;
+use App\Visitors;
+use App\StatusPendaftar;
+use App\Mail\kontakEmail;
+use App\Mail\registrasiEmail;
+use Analytics;
+use Spatie\Analytics\Period;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class funcController extends Controller
@@ -121,6 +133,16 @@ class funcController extends Controller
 		$jml = DB::table('t_pendaftar')->count();
 		return response()->json(['jumlah_pendaftar' => $jml]);
 	}
+	
+	public function jumlah_tervalidasi(){
+		$jml = StatusPendaftar::where('status', 2)->count();
+		return response()->json(['tervalidasi' => $jml]);
+	}
+	
+	public function jumlah_lulus(){
+		$jml = StatusPendaftar::where('status', 3)->count();
+		return response()->json(['lulus' => $jml]);
+	}
 
     public function agama(){
         //return Agama::all();
@@ -147,6 +169,10 @@ class funcController extends Controller
         return Hubungan::all();
     }
 
+	public function kelas(){
+        return Kelas::all();
+    }
+	
     public function jarak(){
         return Jarak::all();
     }
@@ -192,15 +218,211 @@ class funcController extends Controller
 		return response()->json($kabupaten);
 	}
 
-    public function set_informasi(Request $request){
-        // return Agama::all();
-    }
-
     public function edit_informasi(Request $request){
-        // return Agama::all();
+		$informasi = $request->input('informasi');
+		// Retrieve info by name, or create it if it doesn't exist...
+		$info = Info::updateOrCreate(
+			['id' => 1],
+			['informasi' => $informasi]
+		);
+		return response()->json(['status' => 'success', 'data' => $info]);
     }
 
-    public function delete_informasi(Request $request){
-        // return Agama::all();
+	public function info(){
+		try{
+			$info = Info::firstOrCreate(['id' => 1]);
+			return response()->json(['status' => 'success', 'data' => $info]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}		
+	}
+	
+	public function status(Request $request){
+		$str_cari = $request->input('pencarian');
+		$pendaftar = Pendaftar::select(['id','nama_lengkap', 'tempat_lahir', 'tanggal_lahir'])->where('nama_lengkap', 'like', '%' . $str_cari . '%')->with('status_pendaftar:pendaftar_id,noRegistrasi,status')->get();
+		$status_pendaftar = StatusPendaftar::select('pendaftar_id', 'noRegistrasi', 'status')->where('noRegistrasi', 'like', '%' . $str_cari . '%')->with('pendaftar:id,nama_lengkap,tempat_lahir,tanggal_lahir')->get();
+		$data = [];
+		for($i=0;$i<$pendaftar->count();$i++){
+			array_push($data, [
+				'id' => $pendaftar[$i]->id,
+				'nama_lengkap' => $pendaftar[$i]->nama_lengkap,
+				'tempat_lahir' => $pendaftar[$i]->tempat_lahir,
+				'tanggal_lahir' => $pendaftar[$i]->tanggal_lahir,
+				'noRegistrasi' => $pendaftar[$i]->status_pendaftar->noRegistrasi,
+				'status' => $pendaftar[$i]->status_pendaftar->status
+			]);
+		}
+		for($i=0;$i<$status_pendaftar->count();$i++){
+			array_push($data, [
+				'id' => $status_pendaftar[$i]->pendaftar_id,
+				'nama_lengkap' => $status_pendaftar[$i]->pendaftar->nama_lengkap,
+				'tempat_lahir' => $status_pendaftar[$i]->pendaftar->tempat_lahir,
+				'tanggal_lahir' => $status_pendaftar[$i]->pendaftar->tanggal_lahir,
+				'noRegistrasi' => $status_pendaftar[$i]->noRegistrasi,
+				'status' => $status_pendaftar[$i]->status
+			]);
+		}
+		return response()->json($data);
+	}
+	
+	public function updatestatus(Request $request){
+		$id = $request->input('id');
+		$status = $request->input('status');
+		$status_pendaftar = StatusPendaftar::where('pendaftar_id', $id)->update(['status' => $status]);
+		return response()->json(['status' => 'success', 'data' => $status_pendaftar]);
+	}
+	
+	public function kirimpesan(Request $request){
+		$data = [
+			'nama_pengirim' => $request->input('nama_pengirim'),
+			'email' => $request->input('email'),
+			'subjek' => $request->input('subjek'),
+			'konten' => $request->input('konten')
+		];
+		$status = '';
+		try{
+			Mail::to(env('MAIL_REPLYTO_ADDRESS', 'manduabulukumba@gmail.com'))->send(new kontakEmail($data));
+			$status = 'success';
+		} catch(Exception $e){
+			$status = 'error';
+			return response()->json(['status' => 'error']);
+		}
+		if (Mail::failures()) {
+			$status = 'error';
+        }else{
+			$status = 'success';
+        }
+		return response()->json(['status' => $status]);
+	}
+	
+	public function jadwal_ppdb(){
+		try{
+			$date_now=date_create('now');
+			date_add($date_now,date_interval_create_from_date_string("30 days"));
+			$waktu_akhir = date_format($date_now,"Y-m-d");
+			$jadwal = JadwalPpdb::firstOrCreate(['id' => 1], ['waktu_mulai' => date("Y-m-d"), 'waktu_akhir' => $waktu_akhir]);
+			return response()->json(['status' => 'success', 'data' => $jadwal]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}		
     }
+	
+	public function setwaktu(Request $request){
+		try{
+			$jadwal = JadwalPpdb::updateOrCreate(
+			['id' => 1],
+			['waktu_mulai' => $request->waktu_mulai, 'waktu_akhir' => $request->waktu_akhir]);
+			return response()->json(['status' => 'success', 'data' => $jadwal]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}		
+	}
+	
+	public function getAnalytics(){
+		try{
+			//retrieve visitors and pageview data for the current day and the last 30 days
+			$analyticsData = Analytics::fetchTotalVisitorsAndPageViews(Period::days(30));
+			$total = 0;
+			for($i=0;$i<count($analyticsData);$i++){
+				$total += $analyticsData[$i]['pageViews'];
+			}
+			return response()->json(['status' => 'success', 'data' => $total]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}		
+	}
+	
+	public function getBrowserAnalytics(){
+		try{
+			$analyticsData = Analytics::fetchTopBrowsers(Period::days(30));
+			return response()->json(['status' => 'success', 'data' => $analyticsData]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}	
+	}
+	
+	public function analytic(){
+		return response()->json(Analytics::getAnalyticsService());
+	}
+	
+	public function getVisitors(Request $request){
+		try{
+			$visitors = Visitors::firstOrCreate(
+				['ip' => $request->ip()]
+			);
+			$total = Visitors::all();
+			return response()->json(['status' => 'success', 'data' => $total->count()]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}	
+	}
+	
+	public function setKelasPendaftar(Request $request){
+		try{
+			$kelas_pendaftar = PendaftarKelas::updateOrCreate(
+				['pendaftar_id' => $request->input('id')],
+				[
+					'kelas_id' => $request->input('kelas_id'),
+					'nis' => $request->input('nis')	
+				]
+			);
+			return response()->json(['status' => 'success']);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}	
+	}
+	
+	public function deleteKelasPendaftar(Request $request){
+		try{
+			$kelas_pendaftar = PendaftarKelas::where('pendaftar_id', $request->input('id'))->delete();
+			return response()->json(['status' => 'success']);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}	
+	}
+	
+	public function cekKelasPendaftar(Request $request){
+		try{
+			$kelas_pendaftar = PendaftarKelas::where('pendaftar_id', $request->input('id'));
+			if($kelas_pendaftar->count()>0){
+				$data = $kelas_pendaftar->first();
+			} else {
+				$data = null;
+			}
+			return response()->json(['status' => 'success', 'data' => $data]);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}	
+	}
+	
+	public function clearAttachment(){
+		try{
+			$prefix_path = 'public/attachment/';
+			$list = Storage::allFiles($prefix_path);
+			for($i=0;$i<count($list);$i++){
+				$last_modified = Storage::lastModified($list[$i]);
+				if((time()-$last_modified)>900){ //1 menit = 60
+					//$waktu[] = 'time:'.time().',modified:'.$last_modified.',selisih:'.(time()-$last_modified);
+					Storage::delete($list[$i]);
+				}
+			}
+			return response()->json(['status' => 'success']);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}
+	}
+	
+	public function isPinValid(Request $request){
+		try{
+			$pin = StatusPendaftar::where(['noRegistrasi' => $request->input('no_reg'), 'pin' => $request->input('pin')]);
+			if($pin->count()>0){
+				return response()->json(['status' => 'success']);
+			} else {
+				return response()->json(['status' => 'error']);
+			}
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
+		}
+	}
+
 }

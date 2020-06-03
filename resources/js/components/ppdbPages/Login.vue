@@ -1,29 +1,26 @@
 <template>
-<div>
-	<card>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="alert alert-info" style="font-size:1.5rem;font-weight:bold">
-					LOGIN
+	<div class="content">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4 offset-md-4 text-center mb-3">
+					<img src="http://ppdb.ccom/uploads/m2b.png" class="xlogo">
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<base-input type="text" label="Username" v-model="username" :validatedClass="$v.username.$error"></base-input>
+			<form @submit.prevent="validate">
+			<div class="row">
+				<div class="col-md-4 offset-md-4">
+					<card>
+						<div class="alert alert-primary" style="font-size:1.5rem;font-weight:bold">
+							LOGIN
+						</div>
+						<base-input type="text" label="Username" v-model="username" :validatedClass="$v.username.$error"></base-input>
+						<base-input type="password" label="Password" v-model="password" :validatedClass="$v.password.$error"></base-input>
+						<button type="submit" class="btn btn-fill btn-block btn-info">SUBMIT</button>
+					</card>
+				</div>
 			</div>
+			</form>
 		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<base-input type="text" label="Password" v-model="password" :validatedClass="$v.password.$error"></base-input>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<button type="button" class="btn btn-fill btn-block btn-info" @click="validate">SUBMIT</button>
-			</div>
-		</div>
-		</card>
 	</div>
 </template>
 
@@ -60,32 +57,48 @@ export default {
     },
     computed: {
         ...mapGetters(['isAuth']), //MENGAMBIL GETTERS isAuth DARI VUEX
-      	//...mapState(['errors'])
+      	...mapState(['errors'])
     },
     methods: {
+		 ...mapActions('auth', ['submit']), //MENGISIASI FUNGSI submit() DARI VUEX AGAR DAPAT DIGUNAKAN PADA COMPONENT TERKAIT. submit() BERASAL DARI ACTION PADA FOLDER STORES/auth.js
+        ...mapMutations(['CLEAR_ERRORS']),
 		validate() {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
-			if(this.$v.$error) {
-				this.modalBox('Gagal', 'Login salah, silakan coba lagi!', 'warning');
-			} else {
-				this.$router.push({ name: 'Home' })
-			}			
+			if(this.$v.$error) this.modalBox('Gagal', 'Login salah, silakan coba lagi!', 'warning');
+			this.submit(this.$data).then((res) => {
+				if(res.status=='failed'){
+					this.modalBox('Gagal', 'Login salah, silakan coba lagi!', 'warning');
+				} else {
+					//KEMUDIAN DI CEK VALUE DARI isAuth
+					//APABILA BERNILAI TRUE
+					if (this.isAuth) {
+						this.CLEAR_ERRORS()
+						//MAKA AKAN DI-DIRECT KE ROUTE DENGAN NAME home
+						this.$router.push({ name: 'Home' })
+					}
+				}
+            })
 		},
-		
+		modalBox(header, msg, icon){
+			Swal.fire(
+			  header,
+			  msg,
+			  icon
+			)
+		}
     },
-	modalBox(header, msg, icon){
-		Swal.fire(
-		  header,
-		  msg,
-		  icon
-		)
-	}
 };
 </script>
 
 <style scope>
 .is-invalid : {
 	border-color: #f79483;
+}
+
+.xlogo {
+	width: 120px;
+	height: 110px;
+	opacity: 0.5;
 }
 
 .col-width: 100px;

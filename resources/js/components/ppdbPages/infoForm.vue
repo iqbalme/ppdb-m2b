@@ -4,17 +4,18 @@
         <div class="row">
             <div class="col-md">
                 <card>
-                    <h4 slot="header" class="card-title">Informasi</h4>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="ck-content p-4" v-html="editorData"></div>
-                            </div>
-                        </div>
-						<div class="row">
-                            <div class="col-md-12">
-                                <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
-                            </div>
-                        </div>
+                    <div class="row">
+						<div class="col-md-12">
+							<div class="alert alert-primary text-center" style="font-size:1.5rem;font-weight:bold">
+								INFORMASI
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="ck-content p-4" v-html="informasi"></div>
+						</div>
+					</div>
                 </card>
             </div>
         </div>
@@ -24,6 +25,7 @@
 
 <script>
 import Card from "./../themeComponents/Cards/Card.vue";
+import $axios from '../../api.js';
 
 export default {
     components: {
@@ -31,11 +33,22 @@ export default {
     },
     data() {
         return {
-		
+			informasi: ''
 		}
     },
+	created(){
+		this.getInfo();
+	},
     methods: {
-
+		getInfo() {
+		  $axios.get('/informasi')
+			.then((response)=> {
+			  var data = response.data;
+			  if(data.status == 'success'){
+				this.informasi = data.data.informasi;
+			  }			  
+			});
+		},
     }
 };
 </script>

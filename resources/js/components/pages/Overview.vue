@@ -9,11 +9,11 @@
             </div>
             <div slot="content">
               <p class="card-category">Pengunjung</p>
-              <h4 class="card-title">105GB</h4>
+              <h4 class="card-title">{{ visitors }}</h4>
             </div>
-            <div slot="footer">
+            <!--div slot="footer">
               <i class="fa fa-refresh"></i>Updated now
-            </div>
+            </div-->
           </stats-card>
         </div>
 
@@ -26,9 +26,9 @@
               <p class="card-category">Pendaftar</p>
               <h4 class="card-title">{{ pendaftar }}</h4>
             </div>
-            <div slot="footer">
+            <!--div slot="footer">
               <i class="fa fa-calendar-o"></i>Total
-            </div>
+            </div-->
           </stats-card>
         </div>
 
@@ -39,11 +39,11 @@
             </div>
             <div slot="content">
               <p class="card-category">Tervalidasi</p>
-              <h4 class="card-title">23</h4>
+              <h4 class="card-title">{{ j_validated }}</h4>
             </div>
-            <div slot="footer">
+            <!--div slot="footer">
               <i class="fa fa-clock-o"></i>Last day
-            </div>
+            </div-->
           </stats-card>
         </div>
 
@@ -53,62 +53,59 @@
               <i class="nc-icon nc-favourite-28 text-primary"></i>
             </div>
             <div slot="content">
-              <p class="card-category">Followers</p>
-              <h4 class="card-title">+45</h4>
+              <p class="card-category">Lulus</p>
+              <h4 class="card-title">{{ lulus }}</h4>
             </div>
-            <div slot="footer">
+            <!--div slot="footer">
               <i class="fa fa-refresh"></i>Updated now
-            </div>
+            </div-->
           </stats-card>
         </div>
-
       </div>
-      <div class="row">
+
+	<div class="row">
         <div class="col-md-8">
-          <chart-card :chart-data="lineChart.data"
-                      :chart-options="lineChart.options"
-                      :responsive-options="lineChart.responsiveOptions">
+          <chart-card
+            :chart-data="barChart.data"
+            :chart-options="barChart.options"
+            :chart-responsive-options="barChart.responsiveOptions"
+            chart-type="Bar">
             <template slot="header">
-              <h4 class="card-title">Users Behavior</h4>
-              <p class="card-category">24 Hours performance</p>
+              <h4 class="card-title">Grafik Pendaftar</h4>
+              <p class="card-category">Berdasarkan status</p>
             </template>
             <template slot="footer">
               <div class="legend">
-                <i class="fa fa-circle text-info"></i> Open
-                <i class="fa fa-circle text-danger"></i> Click
-                <i class="fa fa-circle text-warning"></i> Click Second Time
+                <!--i class="fa fa-circle text-info"></i> Tesla Model S
+                <i class="fa fa-circle text-danger"></i-->
               </div>
               <hr>
               <div class="stats">
-                <i class="fa fa-history"></i> Updated 3 minutes ago
+                <i class="fa fa-check"></i> Data valid
               </div>
             </template>
           </chart-card>
         </div>
-
-        <div class="col-md-4">
+	  <div class="col-md-4">
           <chart-card :chart-data="pieChart.data" chart-type="Pie">
             <template slot="header">
-              <h4 class="card-title">Email Statistics</h4>
-              <p class="card-category">Last Campaign Performance</p>
+              <h4 class="card-title">Statistik</h4>
+              <p class="card-category">Top browser</p>
             </template>
             <template slot="footer">
               <div class="legend">
-                <i class="fa fa-circle text-info"></i> Open
+                <!--i class="fa fa-circle text-info"></i> Open
                 <i class="fa fa-circle text-danger"></i> Bounce
-                <i class="fa fa-circle text-warning"></i> Unsubscribe
+                <i class="fa fa-circle text-warning"></i-->
               </div>
               <hr>
               <div class="stats">
-                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
+                <i class="fa fa-clock-o"></i> 30 Hari terakhir
               </div>
             </template>
           </chart-card>
         </div>
-      </div>
-
-      
-      </div>
+	  </div>
     </div>
   </div>
 </template>
@@ -123,58 +120,26 @@
       ChartCard,
       StatsCard
     },
-    data () {
+    data() {
       return {
 		pendaftar: 0,
+		tervalidasi: 0,
+		lulus: 0,
+		pageViews: 0,
+		visitors: 0,
         editTooltip: 'Edit Task',
         deleteTooltip: 'Remove',
         pieChart: {
           data: {
-            labels: ['40%', '20%', '40%'],
-            series: [40, 20, 40]
+            labels: [],
+            series: []
           }
-        },
-        lineChart: {
-          data: {
-            labels: ['9:00AM', '12:00AM', '3:00PM', '6:00PM', '9:00PM', '12:00PM', '3:00AM', '6:00AM'],
-            series: [
-              [287, 385, 490, 492, 554, 586, 698, 695],
-              [67, 152, 143, 240, 287, 335, 435, 437],
-              [23, 113, 67, 108, 190, 239, 307, 308]
-            ]
-          },
-          options: {
-            low: 0,
-            high: 800,
-            showArea: false,
-            height: '245px',
-            axisX: {
-              showGrid: false
-            },
-            lineSmooth: true,
-            showLine: true,
-            showPoint: true,
-            fullWidth: true,
-            chartPadding: {
-              right: 50
-            }
-          },
-          responsiveOptions: [
-            ['screen and (max-width: 640px)', {
-              axisX: {
-                labelInterpolationFnc (value) {
-                  return value[0]
-                }
-              }
-            }]
-          ]
         },
         barChart: {
           data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: ['Pendaftar', 'Terverifikasi', 'Lulus'],
             series: [
-              [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-              [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695]
+              []
             ]
           },
           options: {
@@ -182,7 +147,7 @@
             axisX: {
               showGrid: false
             },
-            height: '245px'
+            height: '245px',
           },
           responsiveOptions: [
             ['screen and (max-width: 640px)', {
@@ -194,40 +159,108 @@
               }
             }]
           ]
-        },
-        tableData: {
-          data: [
-            {title: 'Sign contract for "What are conference organizers afraid of?"', checked: false},
-            {title: 'Lines From Great Russian Literature? Or E-mails From My Boss?', checked: true},
-            {
-              title: 'Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit',
-              checked: true
-            },
-            {title: 'Create 4 Invisible User Experiences you Never Knew About', checked: false},
-            {title: 'Read "Following makes Medium better"', checked: false},
-            {title: 'Unfollow 5 enemies from twitter', checked: false}
-          ]
         }
       }
     },
-	mounted(){
+	created(){
+		this.clearAttachment();
 		this.getPendaftar();
+		this.getValidated();
+		this.getLulus();
+		this.getVisitors();
+		//this.getPageViews();
+		//this.getBrowser();
+		// this.barChart.data.series[0].push(15);
+		// this.barChart.data.series[0].push(45);
+		// this.barChart.data.series[0].push(32);
+		this.barChart.data.series[0].push(this.pendaftar);
+		this.barChart.data.series[0].push(this.j_validated);
+		this.barChart.data.series[0].push(this.lulus);
+	},
+	computed: {
+		j_validated: function(){
+			return this.tervalidasi + this.lulus;
+		}
+	},
+	watch: {
+		pendaftar: function(){
+			this.barChart.data.series[0][0] = this.pendaftar;
+		},
+		j_validated: function(){
+			this.barChart.data.series[0][1] = this.j_validated;
+		},
+		lulus: function(){
+			this.barChart.data.series[0][2] = this.lulus;
+		},
 	},
 	methods: {
+		getPageViews() {
+		  axios
+			.get('/api/analytics-pv')
+			.then((response)=> {
+			  var items = response.data;
+			  if(items.status=='success'){
+				this.pageViews = items.data;
+			  }
+			});
+		},
 		getPendaftar() {
 		  axios
 			.get('/api/jumlah_pendaftar')
 			.then((response)=> {
 			  var items = response.data;
 			  this.pendaftar = items.jumlah_pendaftar;
-			})
-			.catch(error => {
-			  console.log(error);
 			});
+		},
+		getValidated() {
+		  axios
+			.get('/api/jumlah_tervalidasi')
+			.then((response)=> {
+			  var items = response.data;
+			  this.tervalidasi = items.tervalidasi;
+			});
+		},
+		getLulus() {
+		  axios
+			.get('/api/jumlah_lulus')
+			.then((response)=> {
+			  var items = response.data;
+			  this.lulus = items.lulus;
+			});
+		},
+		getBrowser() {
+		  axios
+			.get('/api/browser-ga')
+			.then((response)=> {
+			  var res = response.data;
+			  if(res.status == 'success'){
+				for(var i=0;i<res.data.length;i++){
+					this.pieChart.data.series.push(res.data[i].sessions);
+				}
+				for(var i2=0;i2<res.data.length;i2++){
+					this.pieChart.data.labels.push(res.data[i2].browser);
+				}
+			  }
+			});
+		},
+		getVisitors() {
+		  axios
+			.get('/api/visitors')
+			.then((response)=> {
+			  var res = response.data;
+			  if(res.status == 'success'){
+				this.visitors = res.data;
+			  }
+			});
+		},
+		clearAttachment() {
+		  axios.get('/api/clearAttachment');
 		},
 	}
   }
 </script>
 <style>
-
+.ct-bar {
+	stroke-width: 70px;
+}
 </style>

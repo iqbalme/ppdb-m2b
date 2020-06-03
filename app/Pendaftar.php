@@ -11,15 +11,15 @@ class Pendaftar extends Model
     protected $guarded = [];
 
 	public function agama(){
-        return $this->hasOne('App\Agama');
+        return $this->belongsTo('App\Agama');
     }
 	
 	public function hobi(){
-        return $this->hasOne('App\Hobi');
+        return $this->belongsTo('App\Hobi');
     }	
 	
 	public function cita_cita(){
-        return $this->hasOne('App\CitaCita');
+        return $this->belongsTo('App\CitaCita');
     }	
 	
 	public function data_pendaftar(){
@@ -39,7 +39,11 @@ class Pendaftar extends Model
     }
 	
 	public function status_pendaftar(){
-        return $this->hasOne('App\StatusPendaftar');
+        return $this->hasOne('App\StatusPendaftar', 'pendaftar_id');
+    }
+	
+	public function pendaftar_kelas(){
+        return $this->hasOne('App\PendaftarKelas');
     }
 	
 }

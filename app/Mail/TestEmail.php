@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class TestEmail extends Mailable
+class TestEmail extends Mailable //implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -33,6 +33,7 @@ class TestEmail extends Mailable
                    ->view('testemail')
                    ->with(
                     [
+						
                         'nama' => env('MAIL_FROM_NAME'),
                         'website' => 'www.man2bulukumba.sch.id',
                     ]);

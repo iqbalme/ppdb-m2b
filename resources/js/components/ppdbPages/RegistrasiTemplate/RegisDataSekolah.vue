@@ -1,11 +1,18 @@
 <template>
 <div>
 	<card>
-    <div class="row">
-		<div class="col-md-12">
-			<base-input type="text" label="Nama sekolah" v-model="sekolah.nama_sekolah_asal" :validatedClass="$v.sekolah.nama_sekolah_asal.$error"></base-input>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+					Data Sekolah
+				</div>
+			</div>
 		</div>
-                        </div>
+		<div class="row">
+			<div class="col-md-12">
+				<base-input type="text" label="Nama sekolah" v-model="sekolah.nama_sekolah_asal" :validatedClass="$v.sekolah.nama_sekolah_asal.$error"></base-input>
+			</div>
+		</div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">

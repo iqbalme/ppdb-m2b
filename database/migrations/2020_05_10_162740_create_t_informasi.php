@@ -15,7 +15,7 @@ class CreateTInformasi extends Migration
     {
         Schema::create('t_informasi', function (Blueprint $table) {
             $table->id();
-            $table->longText('informasi');
+            $table->longText('informasi')->nullable();
             $table->timestamps();
         });
     }

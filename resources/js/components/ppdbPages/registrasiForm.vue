@@ -1,7 +1,12 @@
 <template>
 <div class="content">
     <div class="container-fluid">
-        <div class="row">
+		<div class="row" v-if="loading">
+            <div class="col-md text-center">
+				<b-spinner style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
+			</div>
+		</div>
+        <div class="row" v-if="!loading">
             <div class="col-md">
 				<form-wizard shape="square" color="#3498db" 
 					title="Form Registrasi Siswa" 
@@ -48,7 +53,9 @@ import RegisDataWali from './RegistrasiTemplate/RegisDataWali.vue';
 import RegisDataNilai from './RegistrasiTemplate/RegisDataNilai.vue';
 import RegisDataKonfirmasi from './RegistrasiTemplate/RegisDataKonfirmasi.vue';
 import Card from "./../themeComponents/Cards/Card.vue";
+import $axios from '../../api.js';
 import Swal from 'sweetalert2'
+import { mapState } from 'vuex';
 
 export default {
     components: {
@@ -65,7 +72,23 @@ export default {
     data() {
         return {
 			circle : 'circle',
-			finalModel: {},
+			loading: false,
+			finalModel: {},	
+		}
+	},
+	computed: {
+		...mapState(['registrationStatus'])
+	},
+	watch: {
+		registrationStatus: function(){
+			if(this.registrationStatus!='running'){
+				this.$router.push({ name: 'invalidRegistration' })
+			}
+		}
+	},
+	created(){
+		if(this.registrationStatus!='running'){
+			this.$router.push({ name: 'invalidRegistration' })
 		}
 	},
     methods: {
@@ -73,17 +96,20 @@ export default {
 			this.submitRegistration();
 		},
 		submitRegistration(){
-			axios.post('/api/registrasi', this.finalModel)
+			this.loading = true;
+			$axios.post('/registrasi', this.finalModel)
 			.then((response)=> {
-			  var res = response.data;
-			  if(res.status =='error'){
-				this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
-			  } else {
-				console.log(res.data);
-				this.modalBox('Berhasil', 'Registrasi sukses, anda sudah terdaftar secara online', 'success');
-			  }
+				this.loading=false;
+				var res = response.data;
+				if(res.status =='error'){
+					this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
+				} else {
+					this.modalBox('Berhasil', 'Registrasi sukses, anda sudah terdaftar secara online', 'success');
+					this.$router.push({ name: 'successReg', params: {nama: res.data.pendaftar, no_reg: res.data.no_reg, pin: reg.data.pin}});
+				}
 			})
 			.catch(error => {
+				this.loading=false;
 				this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
 			});
 		},

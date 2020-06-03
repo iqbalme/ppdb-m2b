@@ -7,6 +7,12 @@ import Overview from './../components/pages/Overview.vue'
 import Registrasi from './../components/ppdbPages/registrasiForm.vue'
 import Info from './../components/ppdbPages/infoForm.vue'
 import Login from './../components/ppdbPages/Login.vue'
+import Status from './../components/ppdbPages/Status.vue'
+import Kontak from './../components/ppdbPages/Kontak.vue'
+import successReg from './../components/ppdbPages/successReg.vue'
+import registrationTime from './../components/ppdbPages/registrationTime.vue'
+import invalidRegistration from './../components/ppdbPages/invalidRegistration.vue'
+import tespdf from './../components/ppdbPages/tespdf.vue'
 import RegisDataWali from './../components/ppdbPages/RegistrasiTemplate/RegisDataWali.vue'
 import RegisInfo from './../components/ppdbPages/RegistrasiTemplate/RegisInfo.vue';
 import EditInfo from './../components/ppdbPages/editInfo.vue';
@@ -15,6 +21,8 @@ import RegisDataSekolah from './../components/ppdbPages/RegistrasiTemplate/Regis
 import RegisDataNilai from './../components/ppdbPages/RegistrasiTemplate/RegisDataNilai.vue';
 import RegisDataKonfirmasi from './../components/ppdbPages/RegistrasiTemplate/RegisDataKonfirmasi.vue';
 import Submit from './../components/ppdbPages/tesSubmit.vue';
+import Cetak from './../components/ppdbPages/Cetak.vue';
+import inputEditPendaftar from './../components/ppdbPages/inputEditPendaftar.vue';
 
 const routes = [
   //{
@@ -37,27 +45,67 @@ const routes = [
         name: 'Registrasi',
         component: Registrasi
       },
-      {
-        path: 'info',
-        name: 'Info',
-        component: Info
-      },
 	  {
         path: 'login',
         name: 'Login',
         component: Login
       },
 	  {
-        path: 'regiskonfir',
-        name: 'RegisDataKonfirmasi',
-        component: RegisDataKonfirmasi
+        path: 'status',
+        name: 'Status',
+        component: Status
+      },
+	  {
+        path: 'kontak',
+        name: 'Kontak',
+        component: Kontak
+      },
+	  {
+        path: 'invalidregistration',
+        name: 'invalidRegistration',
+        component: invalidRegistration
+      },
+	  {
+        path: 'suksesreg',
+        name: 'successReg',
+        component: successReg,
+		props: true
+      },
+	  {
+        path: 'cetak',
+        name: 'Cetak',
+        component: Cetak,
+		props: true,
+		//meta: { requiresAuth: true }
+      },
+	  {
+        path: 'waktu',
+        name: 'registrationTime',
+        component: registrationTime,
+		meta: { requiresAuth: true }
+      },
+	  {
+        path: 'input',
+        name: 'inputEditPendaftar',
+        component: inputEditPendaftar,
+		meta: { requiresAuth: true }
+      },
+	  {
+        path: 'tespdf',
+        name: 'tespdf',
+        component: tespdf
+      },
+	  {
+        path: 'tessubmit',
+        name: 'Submit',
+        component: Submit
       }
     ]
   },
   {
     path: '/info',
     component: DashboardLayout,
-    //redirect: '/info',
+    redirect: '/info/index',
 	children: [
 		{
 			path: 'edit',
@@ -65,6 +113,11 @@ const routes = [
 			component: EditInfo,
 			meta: { requiresAuth: true }
 		},
+		{
+			path: 'index',
+			name: 'Info',
+			component: Info
+		  },
 	]
   },
   { path: '*', component: NotFound }

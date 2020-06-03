@@ -11,9 +11,19 @@ use App\NilaiAkademik;
 use App\Prestasi;
 use App\Lampiran;
 use App\StatusPendaftar;
+use App\Mail\registrasiEmail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class RegistrationController extends Controller
 {
+	protected $prefix_path;
+	
+	public function  __construct(){
+		$this->prefix_path = "public/attachment/";
+	}
+
     public function submitRegistration(Request $request){
 		$nama_lengkap = $request->input('nama_lengkap');
 		$nis_lokal = $request->input('nis_lokal');
@@ -68,6 +78,8 @@ class RegistrationController extends Controller
 		$fileFotoPath = $request->input('fileFotoPath');
 		$fileLampiranPath = $request->input('fileLampiranPath'); //array
 		$email = $request->input('email');
+		$agama_ayah = $request->input('agama_ayah');
+		$agama_ibu = $request->input('agama_ibu');
 		try{
 			// Begin the transaction
 			DB::beginTransaction();		
@@ -123,6 +135,8 @@ class RegistrationController extends Controller
 			$data_pendaftar->no_hp_wali = $no_hp_wali;
 			$data_pendaftar->alamat_ortu_wali = $alamat_tinggal;
 			$data_pendaftar->no_kip = $no_kip;
+			$data_pendaftar->agama_ayah_id = $agama_ayah;
+			$data_pendaftar->agama_ibu_id = $agama_ibu;
 			$pendaftar->data_pendaftar()->save($data_pendaftar);
 			for($i=0;$i<count($nilai_akademik_data);$i++){
 				$nilai_akademik = new NilaiAkademik;
@@ -152,14 +166,113 @@ class RegistrationController extends Controller
 				$pendaftar->lampiran()->save($lampiran);
 			}
 			$status_pendaftar = new StatusPendaftar;
-			$status_pendaftar->noRegistrasi = strtoupper(Str::random(16));
+			$no_reg = strtoupper(Str::random(16));
+			$status_pendaftar->noRegistrasi = $no_reg;
+			$digits_pin = 5;
+			$pin = rand(pow(10, $digits_pin-1), pow(10, $digits_pin)-1);
+			$status_pendaftar->pin = $pin;
 			$pendaftar->status_pendaftar()->save($status_pendaftar);
+			$result = [
+				'pendaftar' => $pendaftar->nama_lengkap,
+				'no_reg' => $no_reg,
+				'pin' => $pin,
+				'email' => $pendaftar->email
+			];
+			$response = response()->json(["status" => "success", "data" => $result]);
 			DB::commit();
-			$response = response()->json(["status" => "success", "data" => $data_pendaftar]);
 		} catch(Throwable $e){
 			//Roll back the transaction
 			DB::rollBack();
 			$response = response()->json(["status" => "error"]);
+		}
+		return $response;
+	}
+	
+		//afterRegistrationSukses
+	public function afterRegistrationSukses(Request $request){
+		$no_reg = 'AFI3043MSKNZR3YG';
+		//$no_reg = $request->no_registrasi;
+		try{
+			$status_pendaftar = StatusPendaftar::where('noRegistrasi', $no_reg)->first();
+			$data = $status_pendaftar->pendaftar()->first()->with(['data_pendaftar','data_pendaftar.hubungan','data_pendaftar.jenis_tinggal','data_pendaftar.jarak','data_pendaftar.transportasi','data_pendaftar.penghasilan','data_pendaftar.pekerjaan_ayah','data_pendaftar.pendidikan_ayah','data_pendaftar.pekerjaan_ibu','data_pendaftar.pendidikan_ibu','data_pendaftar.pekerjaan_wali','data_pendaftar.pendidikan_wali','data_pendaftar.agama_ayah','data_pendaftar.agama_ibu','data_pendaftar.agama_wali','agama','hobi','cita_cita','status_pendaftar','pendaftar_kelas.kelas'])->first();
+			$data['lokasi_surat'] = env('TEMPAT_PERSURATAN');
+			$data['tanggal_surat'] = date("d-m-Y");
+			$data['nama_kepala'] = env('NAMA_KEPALA_SEKOLAH');
+			$data['nip_kepala'] = env('NIP_KEPALA_SEKOLAH');
+			try{
+				$surat_pernyataan_siswa = $this->suratPernyataanSiswa($data);
+				$surat_pernyataan_wali = $this->suratPernyataanWali($data);
+				if(($surat_pernyataan_siswa == 'success') && ($surat_pernyataan_wali == 'success')){
+					$attachments = [
+						$this->prefix_path.'Surat_Pernyataan_Siswa_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf',
+						$this->prefix_path.'Surat_Pernyataan_Wali_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf'
+					];
+					if($data['email']!=null){
+						$sending_email = $this->kirimAttachment($data, $attachments);
+						if($sending_email == 'success'){
+							return response()->json(['status' => 'success']);
+						} else {
+							return response()->json(['status' => 'error']);
+						}
+					} else {
+						return response()->json(['status' => 'success']);
+					}					
+				} else {
+					return response()->json(['status' => 'error']);
+				}
+			} catch(Exception $e){
+				return response()->json(['status' => 'error', 'message' => $e]);
+			}
+		} catch(Exception $e){
+			return response()->json(['status' => 'error', 'message' => $e]);
+		}
+	}
+	
+	//kirim attachment
+	public function kirimAttachment($data, $attachments){
+		$object_to_send = [
+			'data' => $data,
+			'attachments' => $attachments
+		];
+		try{
+			Mail::to($object_to_send['data']['email'])->send(new registrasiEmail($object_to_send));
+			return 'success';
+		} catch(Exception $e){
+			return 'error';
+		}
+	}
+	
+	public function suratPernyataanSiswa($data){
+        $pdf = PDF::loadView('suratPernyataanSiswa', $data)->setPaper('A4', 'portrait')->setWarnings(false);
+		$file_name=$this->prefix_path.'Surat_Pernyataan_Siswa_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf';
+		$isExist = Storage::exists($file_name);
+		if($isExist!=1){
+			$status = Storage::put($file_name, $pdf->output());
+			if($status==1){
+				$response = 'success';
+			} else {
+				$response = 'error';
+			}
+		} else {
+			$response = 'success';
+		}
+		return $response;
+		//now()->addMinutes(1), //menyimpan di server selama 15 menit, setelah itu expired
+	}
+	
+	public function suratPernyataanWali($data){
+		$pdf = PDF::loadView('suratPernyataanWali', $data)->setPaper('A4', 'portrait')->setWarnings(false);
+		$file_name = $this->prefix_path.'Surat_Pernyataan_Wali_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf';
+        $isExist = Storage::exists($file_name);
+		if($isExist!=1){
+			$status = Storage::put($file_name, $pdf->output());
+			if($status==1){
+				$response = 'success';
+			} else {
+				$response = 'error';
+			}
+		} else {
+			$response = 'success';
 		}
 		return $response;
 	}

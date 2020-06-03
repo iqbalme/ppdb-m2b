@@ -15,26 +15,59 @@ class DataPendaftar extends Model
     }
 
 	public function hubungan(){
-        return $this->hasOne('App\Hubungan');
+        return $this->belongsTo('App\Hubungan', 'hubungan_wali_id');
     }	
 	
 	public function jarak(){
-        return $this->hasOne('App\Jarak');
+        return $this->belongsTo('App\Jarak', 'jarak_rumah_madrasah_id');
     }	
 	
 	public function jenis_tinggal(){
-        return $this->hasOne('App\JenisTinggal');
+        return $this->belongsTo('App\JenisTinggal','jenis_tempat_tinggal_id');
     }
 	
 	public function transportasi(){
-        return $this->hasOne('App\Transportasi');
+        return $this->belongsTo('App\Transportasi');
     }	
 	
 	public function penghasilan(){
-        return $this->hasOne('App\Penghasilan');
-    }	
+        return $this->belongsTo('App\Penghasilan');
+    }
+
+	public function pendidikan_ayah(){
+        return $this->belongsTo('App\Pendidikan');
+    }
 	
-	public function pendidikan(){
-        return $this->hasOne('App\Pendidikan');
-    }		
+	public function pekerjaan_ayah(){
+        return $this->belongsTo('App\Pekerjaan');
+    }
+	
+	public function agama_ayah(){
+        return $this->belongsTo('App\Agama');
+    }
+	
+	public function pendidikan_ibu(){
+        return $this->belongsTo('App\Pendidikan');
+    }
+	
+	public function agama_ibu(){
+        return $this->belongsTo('App\Agama');
+    }
+	
+	public function pekerjaan_ibu(){
+        return $this->belongsTo('App\Pekerjaan');
+    }
+	
+	public function pendidikan_wali(){
+        return $this->belongsTo('App\Pendidikan');
+    }
+	
+	public function pekerjaan_wali(){
+        return $this->belongsTo('App\Pekerjaan');
+    }
+	
+	public function agama_wali(){
+        return $this->belongsTo('App\Agama');
+    }
+	
 }

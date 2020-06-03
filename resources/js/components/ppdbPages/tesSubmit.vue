@@ -16,6 +16,7 @@
 
 import Card from "./../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2'
+import $axios from '../../api.js';
 
 export default {
     components: {
@@ -146,19 +147,19 @@ export default {
 	},
     methods: {
 		submitRegistration(){			
-			axios.post('/api/registrasi', this.finalModel)
+			$axios.post('/registrasi', this.finalModel)
 			.then((response)=> {
 			  var res = response.data;
 			  if(res.status =='error'){
 				this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
 			  } else {
-				console.log(res.data);
 				this.modalBox('Berhasil', 'Registrasi sukses, anda sudah terdaftar secara online', 'success');
+				this.$router.push({ name: 'successReg', params: {nama: res.data.pendaftar, no_reg: res.data.no_reg, pin: res.data.pin}});
 			  }
-			})
-			.catch(error => {
-				this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
 			});
+			// .catch(error => {
+				// this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
+			// });
 		},
 		modalBox(header, msg, icon){
 			Swal.fire(

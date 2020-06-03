@@ -11,6 +11,6 @@ class Agama extends Model
     protected $fillable = ['agama'];
 
     public function pendaftar(){
-        return $this->belongsTo('App\Pendaftar')->withDefault();
+        return $this->hasOne('App\Pendaftar', 'agama_id');
     }
 }

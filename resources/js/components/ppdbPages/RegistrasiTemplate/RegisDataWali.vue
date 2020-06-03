@@ -3,7 +3,7 @@
 	<card>
 		<div class="row">
 			<div class="col-md-12">
-				<div class="alert alert-info" style="font-size:1.5rem;font-weight:bold">
+				<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
 					Data Keluarga
 				</div>
 			</div>
@@ -39,13 +39,19 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label">Agama Ayah</label>
+				<b-form-select v-model="wali.agama_ayah" :options="options.list_agama" :class="{'is-invalid': $v.wali.agama_ayah.$error}" @click.native="getAgama"></b-form-select>
+				</div>
+			</div>
+			<div class="col-md-4">
 			<div class="form-group">
 				<label class="control-label">Pekerjaan Ayah</label>
 				<b-form-select v-model="wali.pekerjaan_ayah" :options="options.list_pekerjaan" :class="{'is-invalid': $v.wali.pekerjaan_ayah.$error}" @click.native="getPekerjaan"></b-form-select>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4">
 			<div class="form-group">
 				<label class="control-label">Pendidikan Ayah</label>
 				<b-form-select v-model="wali.pendidikan_ayah" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_ayah.$error}" @click.native="getPendidikan"></b-form-select>
@@ -75,16 +81,22 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-4">
 			<div class="form-group">
-				<label class="control-label">Pekerjaan Ibu</label>
-				<b-form-select v-model="wali.pekerjaan_ibu" :options="options.list_pekerjaan" :class="{'is-invalid': $v.wali.pekerjaan_ibu.$error}"></b-form-select>
+				<label class="control-label">Agama Ibu</label>
+				<b-form-select v-model="wali.agama_ibu" :options="options.list_agama" :class="{'is-invalid': $v.wali.agama_ibu.$error}" @click.native="getAgama"></b-form-select>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label">Pekerjaan Ibu</label>
+				<b-form-select v-model="wali.pekerjaan_ibu" :options="options.list_pekerjaan" :class="{'is-invalid': $v.wali.pekerjaan_ibu.$error}"  @click.native="getPekerjaan"></b-form-select>
+				</div>
+			</div>
+			<div class="col-md-4">
 			<div class="form-group">
 				<label class="control-label">Pendidikan Ibu</label>
-				<b-form-select v-model="wali.pendidikan_ibu" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_ibu.$error}"></b-form-select>
+				<b-form-select v-model="wali.pendidikan_ibu" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_ibu.$error}"  @click.native="getPendidikan"></b-form-select>
 				</div>
 			</div>
 		</div>
@@ -139,16 +151,22 @@
 		</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
+			<div class="col-md-4">
 			<div class="form-group">
-				<label class="control-label">Pekerjaan Wali</label>
-				<b-form-select v-model="wali.pekerjaan_wali" :options="options.list_pekerjaan" :class="{'is-invalid': $v.wali.pekerjaan_wali.$error}" :disabled="disableWaliGrup"></b-form-select>
+				<label class="control-label">Agama Wali</label>
+				<b-form-select v-model="wali.agama_wali" :options="options.list_agama" :class="{'is-invalid': $v.wali.agama_wali.$error}" @click.native="getAgama" :disabled="disableWaliGrup"></b-form-select>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-4">
+			<div class="form-group">
+				<label class="control-label">Pekerjaan Wali</label>
+				<b-form-select v-model="wali.pekerjaan_wali" :options="options.list_pekerjaan" :class="{'is-invalid': $v.wali.pekerjaan_wali.$error}" :disabled="disableWaliGrup"  @click.native="getPekerjaan"></b-form-select>
+				</div>
+			</div>
+			<div class="col-md-4">
 			<div class="form-group">
 				<label class="control-label">Pendidikan Wali</label>
-				<b-form-select v-model="wali.pendidikan_wali" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_wali.$error}" :disabled="disableWaliGrup"></b-form-select>
+				<b-form-select v-model="wali.pendidikan_wali" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_wali.$error}" :disabled="disableWaliGrup"  @click.native="getPendidikan"></b-form-select>
 				</div>
 			</div>
 		</div>
@@ -170,6 +188,7 @@ import 'vue-form-wizard/dist/vue-form-wizard.min.css';
 import V_Pikaday from 'vue-pikaday-directive';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import { dateOption } from './../../../datePickerSetting';
+import $axios from '../../../api.js';
 
 export default {
 	name: "regis-data-wali",
@@ -205,7 +224,10 @@ export default {
 				no_hp_wali: '',
                 pendidikan_wali: null,
                 pekerjaan_wali: null,
-				hubungan_dengan_wali: null
+				hubungan_dengan_wali: null,
+				agama_ayah: null,
+				agama_ibu: null,
+				agama_wali: null
             },
 			ayah_is_almarhum: false,
 			ibu_is_almarhum: false,
@@ -216,7 +238,8 @@ export default {
 				list_pekerjaan: [],
 				list_pendidikan: [],
 				list_penghasilan: [],
-				list_hubungan: []
+				list_hubungan: [],
+				list_agama: []
 			}
         };
     },
@@ -236,6 +259,7 @@ export default {
 				maxLength: maxLength(16)
 			},
 			pekerjaan_ayah: {},
+			agama_ayah: { required },
 			pendidikan_ayah: { required },
 			no_hp_ayah: {
 				numeric,
@@ -248,6 +272,7 @@ export default {
 				maxLength: maxLength(16)
 			},
 			pekerjaan_ibu: {},
+			agama_ibu: { required },
 			pendidikan_ibu: { required },
 			no_hp_ibu: {
 				numeric,
@@ -260,6 +285,7 @@ export default {
 				minLength: minLength(16),
 				maxLength: maxLength(16)
 			},
+			agama_wali: { required },
 			pendidikan_wali: { required },
 			pekerjaan_wali: { required },
 			hubungan_dengan_wali: { required },
@@ -274,11 +300,11 @@ export default {
 	},
 	mounted() {
 		//console.log(this.$v.wali.nama_lengkap.$error);
+		this.getAgama();
 		this.getPekerjaan();
 		this.getPendidikan();
 		this.getPenghasilan();
-		this.getHubungan();
-		
+		this.getHubungan();		
 	},
 	beforeUpdate(){
 		
@@ -295,6 +321,7 @@ export default {
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
 				this.wali.pendidikan_wali = this.wali.pendidikan_ayah;
 				this.wali.no_hp_wali = this.wali.no_hp_ayah;
+				this.wali.agama_wali = this.wali.agama_ayah;
 				this.disableWaliGrup = true;
 			} else {
 				if(this.wali_is_ibu=='false'){
@@ -314,6 +341,7 @@ export default {
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;
 				this.wali.pendidikan_wali = this.wali.pendidikan_ibu;
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
+				this.wali.agama_wali = this.wali.agama_ibu;
 				this.disableWaliGrup = true;
 			} else {
 				if(this.wali_is_ayah=='false'){
@@ -354,6 +382,11 @@ export default {
 				this.wali.pendidikan_wali = this.wali.pendidikan_ayah;
 			}
 		},
+		comp_agama_ayah(){
+			if(this.wali_is_ayah=='true'){
+				this.wali.agama_wali = this.wali.agama_ayah;
+			}
+		},
 		comp_no_hp_ayah(){
 			if(this.wali_is_ayah=='true'){
 				this.wali.no_hp_wali = this.wali.no_hp_ayah;
@@ -391,6 +424,11 @@ export default {
 				this.wali.pendidikan_wali = this.wali.pendidikan_ibu;
 			}
 		},
+		comp_agama_ibu(){
+			if(this.wali_is_ibu=='true'){
+				this.wali.agama_wali = this.wali.agama_ibu;
+			}
+		},
 		comp_no_hp_ibu(){
 			if(this.wali_is_ibu=='true'){
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
@@ -410,6 +448,9 @@ export default {
 		comp_pendidikan_ayah(){
 			return this.wali.pendidikan_ayah;
 		},
+		comp_agama_ayah(){
+			return this.wali.agama_ayah;
+		},
 		comp_no_hp_ayah(){
 			return this.wali.no_hp_ayah;
 		},
@@ -425,6 +466,9 @@ export default {
 		comp_pendidikan_ibu(){
 			return this.wali.pendidikan_ibu;
 		},
+		comp_agama_ibu(){
+			return this.wali.agama_ibu;
+		},
 		comp_no_hp_ibu(){
 			return this.wali.no_hp_ibu;
 		}
@@ -437,12 +481,32 @@ export default {
 			this.$emit('on-validate', this.wali, isValid)
 			return isValid
 		},
-		getPekerjaan() {
-			if(this.options.list_pekerjaan.length==0){
-			  axios
-				.get('/api/pekerjaan')
+		getAgama() {
+			if(this.options.list_agama.length == 0){
+			  $axios
+				.get('/agama')
 				.then((response)=> {
 				  var items = response.data;
+				  this.options.list_agama = [];
+				  for (var i = 0; i < items.length; i++) {
+					this.options.list_agama.push({
+						value : items[i].id,
+						text: items[i].agama
+					});
+				  }
+				})
+				.catch(error => {
+				  console.log(error);
+				});
+			}
+		},
+		getPekerjaan() {
+			if(this.options.list_pekerjaan.length==0){
+			  $axios
+				.get('/pekerjaan')
+				.then((response)=> {
+				  var items = response.data;
+				  this.options.list_pekerjaan = [];
 				  for (var i = 0; i < items.length; i++) {
 					this.options.list_pekerjaan.push({
 						value : items[i].id,
@@ -457,10 +521,11 @@ export default {
 		},
 		getPendidikan() {
 			if(this.options.list_pendidikan.length==0){
-			  axios
-				.get('/api/pendidikan')
+			  $axios
+				.get('/pendidikan')
 				.then((response)=> {
 				  var items = response.data;
+				  this.options.list_pendidikan = [];
 				  for (var i = 0; i < items.length; i++) {
 					this.options.list_pendidikan.push({
 						value : items[i].id,
@@ -475,10 +540,11 @@ export default {
 		},
 		getPenghasilan() {
 			if(this.options.list_penghasilan.length==0){
-			  axios
-				.get('/api/penghasilan')
+			  $axios
+				.get('/penghasilan')
 				.then((response)=> {
 				  var items = response.data;
+				  this.options.list_penghasilan = [];
 				  for (var i = 0; i < items.length; i++) {
 					this.options.list_penghasilan.push({
 						value : items[i].id,
@@ -493,10 +559,11 @@ export default {
 		},
 		getHubungan() {
 			if(this.options.list_hubungan.length==0){
-			  axios
-				.get('/api/hubungan')
+			  $axios
+				.get('/hubungan')
 				.then((response)=> {
 				  var items = response.data;
+				  this.options.list_hubungan = [];
 				  for (var i = 0; i < items.length; i++) {
 					this.options.list_hubungan.push({
 						value : items[i].id,
@@ -519,7 +586,8 @@ export default {
 			this.wali.nik_wali = '';
 			this.wali.hubungan_dengan_wali = null;
 			this.wali.pekerjaan_wali = null;
-			this.wali.pendidkan_wali = null;
+			this.wali.pendidikan_wali = null;
+			this.wali.agama_wali = null;
 			this.wali.no_hp_wali = '';
 			this.wali.tanggal_lahir_wali = '1980-01-01';
 		}

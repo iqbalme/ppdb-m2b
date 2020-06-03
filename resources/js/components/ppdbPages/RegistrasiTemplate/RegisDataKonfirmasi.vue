@@ -3,6 +3,13 @@
 	<card>
 		<div class="row">
 			<div class="col-md-12">
+				<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+					Data Lainnya
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
 				<div class="form-group">
 					<label class="control-label">
 						Upload Foto
@@ -119,6 +126,7 @@
 import { required, requiredIf, sameAs, email} from 'vuelidate/lib/validators';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2';
+import $axios from '../../../api.js';
 
 export default {
 	name: "regis-data-konfirmasi",
@@ -242,7 +250,7 @@ export default {
 			const formData = new FormData();
 			formData.append('upload', this.dokumen.fileFoto);
 			formData.append('jenis_file', 'foto');
-			axios.post('/api/uploadImageRegistration',
+			$axios.post('/uploadImageRegistration',
 				formData,
 				{
 					headers: {
@@ -267,7 +275,7 @@ export default {
 				formData.append('jenis_file', this.lampiran.jenis_lampiran);
 				formData.append('nama_file', this.lampiran.file_lampiran.name);
 				formData.append('keterangan', this.lampiran.keterangan);
-				axios.post('/api/uploadLampiran',
+				$axios.post('/uploadLampiran',
 					formData,
 					{
 						headers: {
@@ -291,7 +299,7 @@ export default {
 				return true
 			} else {
 				for(var ii=0;ii<this.dokumen.fileLampiranPath.length;ii++){
-					axios.post('/api/hapusFileDokumen', {
+					$axios.post('/hapusFileDokumen', {
 						'jenis_file' : 'lampiran',	
 						'filename' : this.dokumen.fileLampiranPath[ii].filename
 					})

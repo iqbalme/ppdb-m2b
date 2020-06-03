@@ -14,7 +14,7 @@
         <span class="navbar-toggler-bar burger-lines"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end">
-        <ul class="nav navbar-nav mr-auto">
+        <!--ul class="nav navbar-nav mr-auto">
           <li class="nav-item">
             <a class="nav-link" href="#" data-toggle="dropdown">
               <i class="nc-icon nc-palette"></i>
@@ -38,9 +38,9 @@
               <span class="d-lg-block">&nbsp;Search</span>
             </a>
           </li>
-        </ul>
+        </ul-->
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
+          <!--li class="nav-item">
             <a class="nav-link" href="#">
               Account
             </a>
@@ -53,11 +53,13 @@
             <a class="dropdown-item" href="#">Something</a>
             <div class="divider"></div>
             <a class="dropdown-item" href="#">Separated link</a>
-          </base-dropdown>
+          </base-dropdown-->
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <button class="btn btn-primary btn-fill" v-if="!isAuth" @click="login">Log in</button>
+			<button class="btn btn-danger btn-fill" v-if="isAuth" @click="logout">Log out</button>
+			<!--a href="#" class="nav-link">
               Log out
-            </a>
+            </a-->
           </li>
         </ul>
       </div>
@@ -65,6 +67,7 @@
   </nav>
 </template>
 <script>
+import { mapActions, mapMutations, mapGetters, mapState } from 'vuex';
   export default {
     computed: {
       routeName () {
@@ -77,7 +80,27 @@
         activeNotifications: false
       }
     },
+	computed: {
+        ...mapGetters(['isAuth']), //MENGAMBIL GETTERS isAuth DARI VUEX
+      	//...mapState(['errors'])
+    },
     methods: {
+		...mapActions('auth', ['logout']), //MENGISIASI FUNGSI submit() DARI VUEX AGAR DAPAT DIGUNAKAN PADA COMPONENT TERKAIT. submit() BERASAL DARI ACTION PADA FOLDER STORES/auth.js
+        ...mapMutations(['CLEAR_ERRORS']),
+		login(){
+			this.$router.push('/login')
+		},
+		//KETIKA TOMBOL LOGOUT DITEKAN, FUNGSI INI DIJALANKAN
+		logout() {
+			return new Promise((resolve, reject) => {
+				localStorage.removeItem('token') //MENGHAPUS TOKEN DARI LOCALSTORAGE
+				resolve()
+			}).then(() => {
+				//MEMPERBAHARUI STATE TOKEN
+				this.$store.state.token = localStorage.getItem('token')
+				this.$router.push('/login') //REDIRECT KE PAGE LOGIN
+			})
+		},
       capitalizeFirstLetter (string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
       },
