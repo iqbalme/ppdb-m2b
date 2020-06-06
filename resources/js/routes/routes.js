@@ -23,6 +23,7 @@ import RegisDataKonfirmasi from './../components/ppdbPages/RegistrasiTemplate/Re
 import Submit from './../components/ppdbPages/tesSubmit.vue';
 import Cetak from './../components/ppdbPages/Cetak.vue';
 import inputEditPendaftar from './../components/ppdbPages/inputEditPendaftar.vue';
+import pendaftarView from './../components/ppdbPages/pendaftarView.vue';
 
 const routes = [
   //{
@@ -88,7 +89,14 @@ const routes = [
         path: 'input',
         name: 'inputEditPendaftar',
         component: inputEditPendaftar,
-		meta: { requiresAuth: true }
+		meta: { requiresAuth: true },
+		props: true,
+      },
+	  {
+        path: 'pendaftar/:no_reg',
+        name: 'pendaftarView',
+        component: pendaftarView,
+		props: true,
       },
 	  {
         path: 'tespdf',

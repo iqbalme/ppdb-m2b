@@ -15,10 +15,10 @@ class CreateTDataPendaftar extends Migration
     {
         Schema::create('t_data_pendaftar', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pendaftar_id')->unsigned();
+            $table->bigInteger('pendaftar_id')->unsigned()->unique();
             $table->foreign('pendaftar_id')->on('t_pendaftar')->references('id')->delete('cascade');
-            $table->string('no_peserta_un');
-            $table->double('total_nilai_un');
+            $table->string('no_peserta_un')->nullable();
+            $table->double('total_nilai_un')->nullable();
             $table->date('tanggal_kelulusan');
             $table->string('nama_sekolah_asal');
             $table->enum('status_sekolah_asal', ['negeri', 'swasta']);
@@ -35,7 +35,7 @@ class CreateTDataPendaftar extends Migration
             $table->foreign('transportasi_id')->on('t_transportasi')->references('id')->delete('cascade');
             $table->string('no_kk');
             $table->string('nama_ayah');
-            $table->string('nik_ayah');
+            $table->string('nik_ayah')->nullable();
             $table->string('no_hp_ayah')->nullable();
 			$table->bigInteger('agama_ayah_id')->unsigned();
             $table->foreign('agama_ayah_id')->on('t_agama')->references('id')->delete('cascade');
@@ -44,7 +44,7 @@ class CreateTDataPendaftar extends Migration
             $table->bigInteger('pendidikan_ayah_id')->unsigned();
             $table->foreign('pendidikan_ayah_id')->on('t_pendidikan')->references('id')->delete('cascade');
             $table->string('nama_ibu_kandung');
-            $table->string('nik_ibu_kandung');
+            $table->string('nik_ibu_kandung')->nullable();
             $table->string('no_hp_ibu_kandung')->nullable();
 			$table->bigInteger('agama_ibu_id')->unsigned();
             $table->foreign('agama_ibu_id')->on('t_agama')->references('id')->delete('cascade');

@@ -141,7 +141,10 @@ export default {
 						"jenis_file": "sertifikat",
 						"keterangan": "piagam pramuka"
 					}
-				]
+				],
+				"agama_ayah": 1,
+				"agama_ibu" : 1,
+				"agama_wali": 1
 			}
 		}
 	},

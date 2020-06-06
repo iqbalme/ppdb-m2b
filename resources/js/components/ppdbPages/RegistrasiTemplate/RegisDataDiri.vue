@@ -113,7 +113,7 @@
 				</div>
 			</div>
 			<div class="col-md-2">
-				<base-input type="text" label="Kode pos" v-model="siswa.kodepos" :validatedClass="$v.siswa.kodepos.$error"></base-input>
+				<base-input type="text" label="Kode pos" v-model="siswa.kodepos" :validatedClass="$v.siswa.kodepos.$error" maxLength="5"></base-input>
 			</div>
 		</div>
 		<div class="row">
@@ -146,6 +146,7 @@ import V_Pikaday from 'vue-pikaday-directive';
 import { tanggal, maxValueAnakKe } from './../../../customValidator';
 import { dateOption } from './../../../datePickerSetting';
 import $axios from '../../../api.js';
+import { mapState } from 'vuex';
 
 export default {
 	name: "regis-data-diri",
@@ -269,6 +270,7 @@ export default {
 		},
 	},
 	mounted() {
+		
 		this.getHobi();
 		this.getCita();
 		this.getAgama();
@@ -276,8 +278,10 @@ export default {
 		this.getTransportasi();
 		this.getJarak();
 		this.getJenisTinggal();
+		
 	},
 	computed: {
+		...mapState(['isEdit', 'loadingState']),
 		maxValue_anakKe: function() {
 		  return parseInt(this.siswa.jml_saudara) + 1;
 		}
@@ -289,8 +293,14 @@ export default {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
 			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
 			var isValid = !this.$v.siswa.$invalid
-			this.$emit('on-validate', this.siswa, isValid)
-			return isValid
+			this.$emit('on-validate', this.siswa, true)
+			return true
+		},
+		appendValueFromParent(val){
+			this.siswa = val;
+			this.getKabupaten(this.siswa.propinsi);
+			this.getKecamatan(this.siswa.kabupaten);
+			this.getKelurahan(this.siswa.kecamatan);
 		},
 		getTransportasi() {
 			if(this.options.list_transportasi.length == 0){
@@ -313,6 +323,7 @@ export default {
 		},
 		getJarak() {
 			if(this.options.list_jarak.length == 0){
+				
 			  $axios
 				.get('/jarak')
 				.then((response)=> {
@@ -324,14 +335,17 @@ export default {
 						text: items[i].jarak
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},
 		getHobi() {
 			if(this.options.list_hobi.length == 0){
+				
 			  $axios
 				.get('/hobi')
 				.then((response)=> {
@@ -343,14 +357,17 @@ export default {
 						text: items[i].hobi
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},
 		getCita() {
 			if(this.options.list_cita_cita.length == 0){
+				
 			  $axios
 				.get('/cita_cita')
 				.then((response)=> {
@@ -362,14 +379,17 @@ export default {
 						text: items[i].cita_cita
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},
 		getAgama() {
 			if(this.options.list_agama.length == 0){
+				
 			  $axios
 				.get('/agama')
 				.then((response)=> {
@@ -381,14 +401,17 @@ export default {
 						text: items[i].agama
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},
 		getPropinsi() {
 			if(this.options.list_propinsi.length == 0){
+				
 			  $axios
 				.get('/propinsi')
 				.then((response)=> {
@@ -400,13 +423,16 @@ export default {
 						text: items[i].nama
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},
 		getKabupaten(id) {
+			
 		  $axios
 			.get('/kabupaten/'+id)
 			.then((response)=> {
@@ -418,12 +444,15 @@ export default {
 					text: items[i].nama
 				});
 			  }
+			  
 			})
 			.catch(error => {
-			  console.log(error);
+				
+			  //console.log(error);
 			});
 		},
 		getKecamatan(id) {
+			
 		  $axios
 			.get('/kecamatan/'+id)
 			.then((response)=> {
@@ -435,12 +464,15 @@ export default {
 					text: items[i].nama
 				});
 			  }
+			  
 			})
 			.catch(error => {
-			  console.log(error);
+				
+			  //console.log(error);
 			});
 		},
 		getKelurahan(id) {
+			
 		  $axios
 			.get('/kelurahan/'+id)
 			.then((response)=> {
@@ -452,13 +484,16 @@ export default {
 					text: items[i].nama
 				});
 			  }
+			  
 			})
 			.catch(error => {
-			  console.log(error);
+				
+			  //console.log(error);
 			});
 		},
 		getJenisTinggal(id) {
 			if(this.options.list_jenis_tinggal.length == 0){
+				
 			  $axios
 				.get('/jenis_tinggal')
 				.then((response)=> {
@@ -470,9 +505,11 @@ export default {
 						text: items[i].jenis_tempat_tinggal
 					});
 				  }
+				  
 				})
 				.catch(error => {
-				  console.log(error);
+					
+				  //console.log(error);
 				});
 			}
 		},

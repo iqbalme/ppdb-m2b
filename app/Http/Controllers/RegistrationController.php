@@ -74,113 +74,144 @@ class RegistrationController extends Controller
 		$total_nilai_un = $request->input('total_nilai_un');
 		$tanggal_kelulusan = $request->input('tanggal_kelulusan');
 		$prestasi_non_akademik_data = $request->input('prestasi_non_akademik'); //array
-		$nilai_akademik_data = $request->input('nilai_akademik');; //array
-		$fileFotoPath = $request->input('fileFotoPath');
+		$nilai_akademik_data = $request->input('nilai_akademik'); //array
+		$fileFotoPath = $request->input('fileFotoPath')[0];
 		$fileLampiranPath = $request->input('fileLampiranPath'); //array
 		$email = $request->input('email');
 		$agama_ayah = $request->input('agama_ayah');
 		$agama_ibu = $request->input('agama_ibu');
+		$agama_wali = $request->input('agama_wali');
 		try{
 			// Begin the transaction
-			DB::beginTransaction();		
-			$pendaftar = Pendaftar::create([
-				'nama_lengkap' => $nama_lengkap,
-				'nis_lokal' => $nis_lokal,
-				'nisn' => $nisn,
-				'nik' => $nik,
-				'tempat_lahir' => $tempat_lahir,
-				'tanggal_lahir' => $tanggal_lahir,
-				'agama_id' => $agama,
-				'jenis_kelamin' => $jenis_kelamin,
-				'hobi_id' =>  $hobi,
-				'cita_cita_id' => $cita_cita,
-				'jumlah_saudara' => $jml_saudara,
-				'anak_ke' => $anak_ke,
-				'foto_path' => $fileFotoPath,
-				'email' => $email
-			]);
-
-			$data_pendaftar = new DataPendaftar;
-			$data_pendaftar->no_peserta_un = $no_peserta_un;
-			$data_pendaftar->total_nilai_un = $total_nilai_un;
-			$data_pendaftar->tanggal_kelulusan = $tanggal_kelulusan;
-			$data_pendaftar->nama_sekolah_asal = $nama_sekolah_asal;
-			$data_pendaftar->status_sekolah_asal = $status_sekolah_asal;
-			$data_pendaftar->npsn_sekolah_asal = $npsn_sekolah_asal;
-			$data_pendaftar->lokasi_sekolah_asal = $lokasi_sekolah_asal;
-			$data_pendaftar->jenis_tempat_tinggal_id = $jenis_tempat_tinggal;
-			$data_pendaftar->alamat = $alamat_tinggal;
-			$data_pendaftar->kel_id = $kelurahan;
-			$data_pendaftar->kode_pos = $kodepos;
-			$data_pendaftar->jarak_rumah_madrasah_id = $jarak_rumah_madrasah;
-			$data_pendaftar->transportasi_id = $transportasi;
-			$data_pendaftar->no_kk = $no_kk;
-			$data_pendaftar->nama_ayah = $nama_ayah;
-			$data_pendaftar->nik_ayah = $nik_ayah;
-			$data_pendaftar->no_hp_ayah = $no_hp_ayah;
-			$data_pendaftar->pekerjaan_ayah_id = $pekerjaan_ayah;
-			$data_pendaftar->pendidikan_ayah_id = $pendidikan_ayah;
-			$data_pendaftar->nama_ibu_kandung = $nama_ibu;
-			$data_pendaftar->nik_ibu_kandung = $nik_ibu;
-			$data_pendaftar->no_hp_ibu_kandung = $no_hp_ibu;
-			$data_pendaftar->pekerjaan_ibu_id = $pekerjaan_ibu;
-			$data_pendaftar->pendidikan_ibu_id = $pendidikan_ibu;
-			$data_pendaftar->penghasilan_id = $penghasilan_perbulan;
-			$data_pendaftar->nama_wali = $nama_lengkap_wali;
-			$data_pendaftar->nik_wali = $nik_wali;
-			$data_pendaftar->tanggal_lahir_wali = $tanggal_lahir_wali;
-			$data_pendaftar->pekerjaan_wali_id = $pekerjaan_wali;
-			$data_pendaftar->pendidikan_wali_id = $pendidikan_wali;
-			$data_pendaftar->hubungan_wali_id = $hubungan_dengan_wali;
-			$data_pendaftar->no_hp_wali = $no_hp_wali;
-			$data_pendaftar->alamat_ortu_wali = $alamat_tinggal;
-			$data_pendaftar->no_kip = $no_kip;
-			$data_pendaftar->agama_ayah_id = $agama_ayah;
-			$data_pendaftar->agama_ibu_id = $agama_ibu;
-			$pendaftar->data_pendaftar()->save($data_pendaftar);
-			for($i=0;$i<count($nilai_akademik_data);$i++){
-				$nilai_akademik = new NilaiAkademik;
-				$nilai_akademik->mapel_id = $nilai_akademik_data[$i]['id'];
-				$nilai_akademik->semester1 = $nilai_akademik_data[$i]['nilai']['semester1'];
-				$nilai_akademik->semester2 = $nilai_akademik_data[$i]['nilai']['semester2'];
-				$nilai_akademik->semester3 = $nilai_akademik_data[$i]['nilai']['semester3'];
-				$nilai_akademik->semester4 = $nilai_akademik_data[$i]['nilai']['semester4'];
-				$nilai_akademik->semester5 = $nilai_akademik_data[$i]['nilai']['semester5'];
-				$nilai_akademik->keterangan = $nilai_akademik_data[$i]['keterangan'];
-				$pendaftar->nilai_akademik()->save($nilai_akademik);
+			DB::beginTransaction();
+			if($request->id == null){
+				$pendaftar = Pendaftar::create([
+					'nama_lengkap' => $nama_lengkap,
+					'nis_lokal' => $nis_lokal,
+					'nisn' => $nisn,
+					'nik' => $nik,
+					'tempat_lahir' => $tempat_lahir,
+					'tanggal_lahir' => $tanggal_lahir,
+					'agama_id' => $agama,
+					'jenis_kelamin' => $jenis_kelamin,
+					'hobi_id' =>  $hobi,
+					'cita_cita_id' => $cita_cita,
+					'jumlah_saudara' => $jml_saudara,
+					'anak_ke' => $anak_ke,
+					'foto_path' => $fileFotoPath,
+					'email' => $email
+				]);
+			} else {
+				$pendaftar = Pendaftar::updateOrCreate(['id' => $request->id],[
+					'nama_lengkap' => $nama_lengkap,
+					'nis_lokal' => $nis_lokal,
+					'nisn' => $nisn,
+					'nik' => $nik,
+					'tempat_lahir' => $tempat_lahir,
+					'tanggal_lahir' => $tanggal_lahir,
+					'agama_id' => $agama,
+					'jenis_kelamin' => $jenis_kelamin,
+					'hobi_id' =>  $hobi,
+					'cita_cita_id' => $cita_cita,
+					'jumlah_saudara' => $jml_saudara,
+					'anak_ke' => $anak_ke,
+					'foto_path' => $fileFotoPath,
+					'email' => $email
+				]);
 			}
-			for($i=0;$i<count($prestasi_non_akademik_data);$i++){
-				$prestasi_non_akademik = new Prestasi;
-				$prestasi_non_akademik->jenis_lomba = $prestasi_non_akademik_data[$i]['jenis_lomba'];
-				$prestasi_non_akademik->tempat_pelaksanaan = $prestasi_non_akademik_data[$i]['tempat_pelaksanaan'];
-				$prestasi_non_akademik->tingkat = $prestasi_non_akademik_data[$i]['tingkat'];
-				$prestasi_non_akademik->peringkat_juara = $prestasi_non_akademik_data[$i]['peringkat_juara'];
-				$pendaftar->prestasi_non_akademik()->save($prestasi_non_akademik);
-			}
-			for($i=0;$i<count($fileLampiranPath);$i++){
-				$lampiran = new Lampiran;
-				$lampiran->nama_file = $fileLampiranPath[$i]['filename'];
-				$lampiran->path = $fileLampiranPath[$i]['url'];
-				$lampiran->jenis_file = $fileLampiranPath[$i]['jenis_file'];
-				$lampiran->keterangan = $fileLampiranPath[$i]['keterangan'];
-				$pendaftar->lampiran()->save($lampiran);
-			}
-			$status_pendaftar = new StatusPendaftar;
-			$no_reg = strtoupper(Str::random(16));
-			$status_pendaftar->noRegistrasi = $no_reg;
-			$digits_pin = 5;
-			$pin = rand(pow(10, $digits_pin-1), pow(10, $digits_pin)-1);
-			$status_pendaftar->pin = $pin;
-			$pendaftar->status_pendaftar()->save($status_pendaftar);
-			$result = [
-				'pendaftar' => $pendaftar->nama_lengkap,
-				'no_reg' => $no_reg,
-				'pin' => $pin,
-				'email' => $pendaftar->email
+			$data_pendaftar = DataPendaftar::firstOrCreate(['pendaftar_id' => $request->id]);
+			$detail_data_pendaftar = [
+				'no_peserta_un' => $no_peserta_un,
+				'total_nilai_un' => $total_nilai_un,
+				'tanggal_kelulusan' => $tanggal_kelulusan,
+				'nama_sekolah_asal' => $nama_sekolah_asal,
+				'status_sekolah_asal' => $status_sekolah_asal,
+				'npsn_sekolah_asal' => $npsn_sekolah_asal,
+				'lokasi_sekolah_asal' => $lokasi_sekolah_asal,
+				'jenis_tempat_tinggal_id' => $jenis_tempat_tinggal,
+				'alamat' => $alamat_tinggal,
+				'kel_id' => $kelurahan,
+				'kode_pos' => $kodepos,
+				'jarak_rumah_madrasah_id' => $jarak_rumah_madrasah,
+				'transportasi_id' => $transportasi,
+				'no_kk' => $no_kk,
+				'nama_ayah' => $nama_ayah,
+				'nik_ayah' => $nik_ayah,
+				'no_hp_ayah' => $no_hp_ayah,
+				'pekerjaan_ayah_id' => $pekerjaan_ayah,
+				'pendidikan_ayah_id' => $pendidikan_ayah,
+				'nama_ibu_kandung' => $nama_ibu,
+				'nik_ibu_kandung' => $nik_ibu,
+				'no_hp_ibu_kandung' => $no_hp_ibu,
+				'pekerjaan_ibu_id' => $pekerjaan_ibu,
+				'pendidikan_ibu_id' => $pendidikan_ibu,
+				'penghasilan_id' => $penghasilan_perbulan,
+				'nama_wali' => $nama_lengkap_wali,
+				'nik_wali' => $nik_wali,
+				'tanggal_lahir_wali' => $tanggal_lahir_wali,
+				'pekerjaan_wali_id' => $pekerjaan_wali,
+				'pendidikan_wali_id' => $pendidikan_wali,
+				'hubungan_wali_id' => $hubungan_dengan_wali,
+				'no_hp_wali' => $no_hp_wali,
+				'alamat_ortu_wali' => $alamat_tinggal,
+				'no_kip' => $no_kip,
+				'agama_ayah_id' => $agama_ayah,
+				'agama_ibu_id' => $agama_ibu,
+				'agama_wali_id' => $agama_wali
 			];
+			$data_pendaftar->fill($detail_data_pendaftar)->save();
+			for($i=0;$i<count($nilai_akademik_data);$i++){
+				$data_akademik = [
+					'semester1' => $nilai_akademik_data[$i]['nilai']['semester1'],
+					'semester2' => $nilai_akademik_data[$i]['nilai']['semester2'],
+					'semester3' => $nilai_akademik_data[$i]['nilai']['semester3'],
+					'semester4' => $nilai_akademik_data[$i]['nilai']['semester4'],
+					'semester5' => $nilai_akademik_data[$i]['nilai']['semester5'],
+					'keterangan' => $nilai_akademik_data[$i]['keterangan']
+				];
+				$nilai_akademik = NilaiAkademik::firstOrCreate(['pendaftar_id' => $request->id, 'mapel_id' => $nilai_akademik_data[$i]['id']]);
+				$nilai_akademik->fill($data_akademik)->save();
+			}
+			$pendaftar->prestasi_non_akademik()->delete();
+			$prestasi_non_akademik = [];
+			foreach ($prestasi_non_akademik_data as $prestasi_non_akademik_data_detail) {
+				$prestasi_non_akademik[] = new Prestasi($prestasi_non_akademik_data_detail);
+			}
+			$pendaftar->prestasi_non_akademik()->saveMany($prestasi_non_akademik);
+			// for($i=0;$i<count($fileLampiranPath);$i++){
+				// $lampiran = Lampiran::where('pendaftar_id', $request->id);
+				// $lampiran->nama_file = $fileLampiranPath[$i]['filename'];
+				// $lampiran->path = $fileLampiranPath[$i]['url'];
+				// $lampiran->jenis_file = $fileLampiranPath[$i]['jenis_file'];
+				// $lampiran->keterangan = $fileLampiranPath[$i]['keterangan'];
+				// $pendaftar->lampiran()->updateOrCreate(['pendaftar_id' => $request->id], $lampiran->toArray());
+			// }
+			if($request->id == null){
+				$status_pendaftar = new StatusPendaftar;
+				$no_reg = strtoupper(Str::random(16));
+				$status_pendaftar->noRegistrasi = $no_reg;
+				$digits_pin = 5;
+				$pin = rand(pow(10, $digits_pin-1), pow(10, $digits_pin)-1);
+				$status_pendaftar->pin = $pin;
+				$pendaftar->status_pendaftar()->updateOrCreate(['pendaftar_id' => $request->id], $status_pendaftar->toArray());
+				$result = [
+					'pendaftar' => $pendaftar->nama_lengkap,
+					'no_reg' => $no_reg,
+					'pin' => $pin,
+					'email' => $pendaftar->email
+				];
+			} else {
+				$status_pendaftar = StatusPendaftar::where('pendaftar_id', $request->id)->first();
+				$result = [
+					'pendaftar' => $pendaftar->nama_lengkap,
+					'no_reg' => $status_pendaftar->noRegistrasi,
+					'pin' => $status_pendaftar->pin,
+					'email' => $pendaftar->email
+				];
+			}
 			$response = response()->json(["status" => "success", "data" => $result]);
 			DB::commit();
-		} catch(Throwable $e){
+		} catch(Exception $e){
 			//Roll back the transaction
 			DB::rollBack();
 			$response = response()->json(["status" => "error"]);
@@ -188,18 +219,32 @@ class RegistrationController extends Controller
 		return $response;
 	}
 	
-		//afterRegistrationSukses
-	public function afterRegistrationSukses(Request $request){
-		$no_reg = 'AFI3043MSKNZR3YG';
-		//$no_reg = $request->no_registrasi;
+	public function tesquery(Request $request){
+		$prestasi_non_akademik_data = $request->input('prestasi_non_akademik'); //array
 		try{
-			$status_pendaftar = StatusPendaftar::where('noRegistrasi', $no_reg)->first();
-			$data = $status_pendaftar->pendaftar()->first()->with(['data_pendaftar','data_pendaftar.hubungan','data_pendaftar.jenis_tinggal','data_pendaftar.jarak','data_pendaftar.transportasi','data_pendaftar.penghasilan','data_pendaftar.pekerjaan_ayah','data_pendaftar.pendidikan_ayah','data_pendaftar.pekerjaan_ibu','data_pendaftar.pendidikan_ibu','data_pendaftar.pekerjaan_wali','data_pendaftar.pendidikan_wali','data_pendaftar.agama_ayah','data_pendaftar.agama_ibu','data_pendaftar.agama_wali','agama','hobi','cita_cita','status_pendaftar','pendaftar_kelas.kelas'])->first();
-			$data['lokasi_surat'] = env('TEMPAT_PERSURATAN');
-			$data['tanggal_surat'] = date("d-m-Y");
-			$data['nama_kepala'] = env('NAMA_KEPALA_SEKOLAH');
-			$data['nip_kepala'] = env('NIP_KEPALA_SEKOLAH');
+			$pendaftar = Pendaftar::find(13);
+			$pendaftar->prestasi_non_akademik()->delete();
+			$prestasi_non_akademik = [];
+			foreach ($prestasi_non_akademik_data as $prestasi_non_akademik_data_detail) {
+				$prestasi_non_akademik[] = new Prestasi($prestasi_non_akademik_data_detail);
+			}
+			return $pendaftar->prestasi_non_akademik()->saveMany($prestasi_non_akademik);
+		} catch(Exception $e){
+			return response()->json(["status" => "error", "message" => $e]);
+		}
+	}
+	
+	
+	//afterRegistrationSukses
+	public function afterRegistrationSuksesPdf(Request $request){
+		$response = $this->afterRegistrationSukses($request);
+		if($response['status'] = 'success'){
+			$data = $response['data'];
 			try{
+				$data['lokasi_surat'] = env('TEMPAT_PERSURATAN');
+				$data['tanggal_surat'] = date("d-m-Y");
+				$data['nama_kepala'] = env('NAMA_KEPALA_SEKOLAH');
+				$data['nip_kepala'] = env('NIP_KEPALA_SEKOLAH');
 				$surat_pernyataan_siswa = $this->suratPernyataanSiswa($data);
 				$surat_pernyataan_wali = $this->suratPernyataanWali($data);
 				if(($surat_pernyataan_siswa == 'success') && ($surat_pernyataan_wali == 'success')){
@@ -223,9 +268,27 @@ class RegistrationController extends Controller
 			} catch(Exception $e){
 				return response()->json(['status' => 'error', 'message' => $e]);
 			}
-		} catch(Exception $e){
-			return response()->json(['status' => 'error', 'message' => $e]);
+		} else {
+			return response()->json(['status' => 'error']);
 		}
+	}
+	
+	public function afterRegistrationSukses(Request $request){
+		//$no_reg = 'WODQYO15ILN2JXA0';
+		$no_reg = $request->no_registrasi;
+		try{
+			$status_pendaftar = StatusPendaftar::where('noRegistrasi', $no_reg);
+			if($status_pendaftar->count()>0){
+				$id_pendaftar = $status_pendaftar->first()->pendaftar_id;
+				$data = Pendaftar::where('id', $id_pendaftar)->with(['data_pendaftar','data_pendaftar.hubungan','data_pendaftar.jenis_tinggal','data_pendaftar.jarak','data_pendaftar.transportasi','data_pendaftar.penghasilan','data_pendaftar.pekerjaan_ayah','data_pendaftar.pendidikan_ayah','data_pendaftar.pekerjaan_ibu','data_pendaftar.pendidikan_ibu','data_pendaftar.pekerjaan_wali','data_pendaftar.pendidikan_wali','data_pendaftar.agama_ayah','data_pendaftar.agama_ibu','data_pendaftar.agama_wali','agama','hobi','cita_cita','status_pendaftar','pendaftar_kelas.kelas','nilai_akademik','nilai_akademik.mapel','prestasi_non_akademik','lampiran'])->first();
+				$response = ['status' => 'success', 'data' => $data];
+			} else {
+				$response = ['status' => 'error'];
+			}			
+		} catch(Exception $e){
+			$response = ['status' => 'error', 'message' => $e];
+		}
+		return $response;
 	}
 	
 	//kirim attachment

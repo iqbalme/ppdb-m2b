@@ -14,4 +14,8 @@ class NilaiAkademik extends Model
         return $this->belongsTo('App\Pendaftar');
     }
 	
+	public function mapel(){
+        return $this->belongsTo('App\Mapel');
+    }
+	
 }

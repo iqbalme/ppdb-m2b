@@ -189,6 +189,7 @@ import V_Pikaday from 'vue-pikaday-directive';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import { dateOption } from './../../../datePickerSetting';
 import $axios from '../../../api.js';
+import { mapState } from 'vuex';
 
 export default {
 	name: "regis-data-wali",
@@ -260,7 +261,7 @@ export default {
 			},
 			pekerjaan_ayah: {},
 			agama_ayah: { required },
-			pendidikan_ayah: { required },
+			pendidikan_ayah: { },
 			no_hp_ayah: {
 				numeric,
 				maxLength: maxLength(16)
@@ -273,7 +274,7 @@ export default {
 			},
 			pekerjaan_ibu: {},
 			agama_ibu: { required },
-			pendidikan_ibu: { required },
+			pendidikan_ibu: { },
 			no_hp_ibu: {
 				numeric,
 				maxLength: maxLength(16)
@@ -298,13 +299,12 @@ export default {
 			},
 		},
 	},
-	mounted() {
-		//console.log(this.$v.wali.nama_lengkap.$error);
+	created() {
 		this.getAgama();
 		this.getPekerjaan();
 		this.getPendidikan();
 		this.getPenghasilan();
-		this.getHubungan();		
+		this.getHubungan();	
 	},
 	beforeUpdate(){
 		
@@ -362,7 +362,7 @@ export default {
 		},
 		comp_pekerjaan_ayah(){
 			if(this.options.list_pekerjaan.length>0){
-				var index = this.getIndexPekerjaan('Pensiunan/Almarhum');
+				var index = this.getIndexPekerjaan('Almarhum');
 				if(this.wali.pekerjaan_ayah == this.options.list_pekerjaan[index].value){
 					this.ayah_is_almarhum = true
 					this.wali.nik_ayah = ''
@@ -433,9 +433,17 @@ export default {
 			if(this.wali_is_ibu=='true'){
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
 			}
-		}
+		},
+		// comp_hubungan_wali(){
+			// if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ayah')){
+				// this.wali_is_ayah = true;
+			// } else if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ibu')){
+				// this.wali_is_ibu = true;
+			// }
+		// }
 	},
 	computed: {
+		...mapState(['loadingState']),
 		comp_nama_ayah(){
 			return this.wali.nama_ayah;
 		},
@@ -471,6 +479,9 @@ export default {
 		},
 		comp_no_hp_ibu(){
 			return this.wali.no_hp_ibu;
+		},
+		comp_hubungan_wali(){
+			return this.wali.hubungan_dengan_wali;
 		}
 	},
     methods: {
@@ -478,8 +489,13 @@ export default {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
 			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
 			var isValid = !this.$v.wali.$invalid
-			this.$emit('on-validate', this.wali, isValid)
-			return isValid
+			this.$emit('on-validate', this.wali, true)
+			return true
+		},
+		appendValueFromParent(val){
+			//if(!this.loadingState){
+				this.wali = val;
+			//}
 		},
 		getAgama() {
 			if(this.options.list_agama.length == 0){
@@ -577,8 +593,12 @@ export default {
 			}
 		},
 		getIndexPekerjaan(val){
-			//this.showForm = true;
-			var index = this.options.list_pekerjaan.map(function(o) { return o.text; }).indexOf(val);
+			//this.showForm = true;)
+			var index = this.options.list_pekerjaan.map(function(o){ return o.text.includes(val) }).indexOf(true);
+			return index;
+		},
+		getIndexHubungan(val){
+			var index = this.options.list_hubungan[this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true)].value;
 			return index;
 		},
 		resetWaliElement(){

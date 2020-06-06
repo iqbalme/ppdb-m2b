@@ -9,7 +9,7 @@
 							CEK STATUS
 						</div>
 						<div class="row" v-if="loading">
-							<div class="col-md-12 text-center">
+							<div class="col-md-12 text-center p-5">
 							  <b-spinner style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
 							</div>
 						</div>
@@ -35,7 +35,7 @@
 				<div class="col-md-12">
 					<b-table hover striped :items="hasil_pencarian" :fields="kolomPencarian" responsive="sm">
 						<template v-slot:cell(no)="data">
-							<div class="col-md-2">
+							<div class="col-md-2"> 
 								{{ data.index + 1 }}
 							</div>
 						</template>
@@ -275,6 +275,8 @@ export default {
 		},
 		editPendaftar(index){
 			//buka input form
+			var no_reg = this.hasil_pencarian[index].no_registrasi;
+			this.$router.push({ name: 'inputEditPendaftar', params: {no_reg: no_reg}});
 		},
 		editStatus(index){
 			this.pickStudent = {

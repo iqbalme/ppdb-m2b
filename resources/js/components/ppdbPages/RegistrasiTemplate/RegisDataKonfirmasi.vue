@@ -8,7 +8,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" v-if="dokumen.fileFotoPath.length==0">
 			<div class="col-md-12">
 				<div class="form-group">
 					<label class="control-label">
@@ -25,6 +25,20 @@
 				  :class="{'is-invalid': $v.dokumen.fileFoto.$error}"
 				></b-form-file>
 				</div>
+			</div>
+		</div>
+		<div class="row" v-if="isEdit && (dokumen.fileFotoPath.length>0)">
+			<div class="col-md-12">
+				<b-alert show variant="secondary">
+					<div class="row">
+						<div class="col-md-11">
+							<a :href="fotoPathx" target="blank" class="btn btn-fill">FOTO : {{ fotoPathx }}</a>
+						</div>
+						<div class="col-md-1">
+							<b-button variant="danger" class="btn-fill" @click="removeFotoTemporary"><b-icon icon="trash-fill"></b-icon></b-button>
+						</div>
+					</div>
+				</b-alert>
 			</div>
 		</div>
 		<div class="row" v-if="$v.dokumen.fileFoto.$error">
@@ -83,9 +97,10 @@
 					{{ data.index + 1 }}
 					</div>
 					</template>
-					<template v-slot:cell(edit)="data">
+					<template v-slot:cell(edit)="data" >
 					<div class="col-md-2" :key="data.index">
-						<b-button variant="danger" class="btn-fill" @click="removeLampiran(data.index)"><b-icon icon="trash-fill"></b-icon></b-button>
+						<b-button variant="danger" class="btn-fill" @click="removeLampiran(data.index)" v-if="!isEdit"><b-icon icon="trash-fill"></b-icon></b-button>
+						<b-button variant="danger" class="btn-fill" @click="removeLampiranTemporary(data.index)" v-if="isEdit"><b-icon icon="trash-fill"></b-icon></b-button>
 					</div>
 					</template>
 				</b-table>
@@ -103,8 +118,8 @@
 				<base-input type="text" label="Email" v-model="dokumen.email" :validatedClass="$v.dokumen.email.$error"></base-input>
 			</div>
 		</div>
-		<hr>
-		<div class="row">
+		<hr v-if="!isAuth">
+		<div class="row" v-if="!isAuth">
 			<div class="col-md-12">
 				<div class="form-group">
 					<b-form-checkbox
@@ -127,6 +142,7 @@ import { required, requiredIf, sameAs, email} from 'vuelidate/lib/validators';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2';
 import $axios from '../../../api.js';
+import { mapMutations, mapState, mapGetters } from 'vuex';
 
 export default {
 	name: "regis-data-konfirmasi",
@@ -138,7 +154,7 @@ export default {
 			dokumen: {
 				fileFoto: null,
 				fileLampiran: [],
-				fileFotoPath: null,
+				fileFotoPath: [],
 				fileLampiranPath: [],
 				email: null
 			},
@@ -156,29 +172,54 @@ export default {
 				jenis_lampiran: null,
 				keterangan: ''
 			},
+			fileToDelete: [],
+			fileToUpload: [],
 			fieldsLampiran: ['no', {key: 'jenis_file', label: 'Jenis File'}, {key: 'nama_file', label: 'Nama File'}, 'keterangan', {key:'edit', label:''}],
         };
     },
 	//MENDEFINISIKAN RULE VALIDASI 
-	validations: {
-		dokumen: {
-			fileFoto: {
-				required
-			},
-			email: {
-				email
+	validations() {
+		if(this.isEdit){
+			return {
+				dokumen: {
+					fileFoto: {
+						requiredIf: requiredIf(function() { return this.comp_fileFotoPath })
+					},
+					email: {
+						email
+					}
+				},
+				persetujuan: {},
+				lampiran: {
+					jenis_lampiran: {
+						requiredIf: requiredIf(function() { return this.isFileLampiran })
+					}
+				}
 			}
-		},
-		persetujuan : {
-			sameAs: val => val === 'setuju'
-		},
-		lampiran: {
-			jenis_lampiran: {
-				requiredIf: requiredIf(function() { return this.isFileLampiran })
+		} else {
+			return {
+				dokumen: {
+					fileFoto: {
+						required
+					},
+					email: {
+						email
+					}
+				},
+				persetujuan : {
+					sameAs: val => val === 'setuju'
+				},
+				lampiran: {
+					jenis_lampiran: {
+						requiredIf: requiredIf(function() { return this.isFileLampiran })
+					}
+				}
 			}
 		}
 	},
 	computed: {
+		...mapState(['isEdit', 'loadingState']),
+		...mapGetters(['isAuth']),
 		isFileLampiran(){
 			if(this.lampiran.file_lampiran == null){
 				return false
@@ -186,6 +227,16 @@ export default {
 				return true
 			}			
 		},
+		comp_fileFotoPath(){
+			return this.dokumen.fileFotoPath.length == 0;
+		},
+		fotoPathx(){
+			if(this.dokumen.fileFotoPath.length>0){
+				return this.dokumen.fileFotoPath[0];
+			} else {
+				return null;
+			}			
+		}
 	},
 	watch: {
 		
@@ -197,14 +248,38 @@ export default {
 				this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
 				return false
 			} else {
-				this.uploadFoto();
-				this.uploadLampiran();
+				if(this.isEdit){
+					if(this.dokumen.fileFotoPath.length == 0){
+						this.uploadFoto();
+					}
+					if(this.fileToDelete.length>0){
+						for(var i=0;i<this.fileToDelete.length;i++){
+							$axios.post('/hapusFileDokumen', {
+								'jenis_file' : this.fileToDelete[i].jenis_file,	
+								'filename' : this.fileToDelete[i].nama_file
+							});
+							$axios.post('/hapusLampiranUser', {
+								'nama_file' : this.fileToDelete[i].nama_file,
+								'id' : this.fileToDelete[i].id
+							});
+						}
+					}
+					if(this.fileToUpload.length>0){
+						this.dokumen.fileLampiranPath = [];
+						this.uploadLampiran(this.fileToDelete)
+					}
+				} else {
+					this.uploadFoto();
+				}
 				this.$emit('on-validate', this.dokumen, true)
 				return true
 			}			
 		},
+		appendValueFromParent(val){
+			this.dokumen = val;
+		},
 		removeLampiran(id){
-			this.dokumen.fileLampiran.slice(id,1);
+			this.dokumen.fileLampiran.splice(id,1);
 		},
 		clearLampiranForm() {
 			this.$refs['file-lampiran-input'].reset();
@@ -230,13 +305,24 @@ export default {
 			};			
 		},
 		insertLampiranToTable(){
-			this.dokumen.fileLampiran.push({
-				jenis_file: this.lampiran.jenis_lampiran,
-				nama_file: this.lampiran.file_lampiran.name,
-				keterangan: this.lampiran.keterangan,
-				file: this.lampiran.file_lampiran
-			});
-			this.clearLampiranForm();
+			this.$v.lampiran.jenis_lampiran.$touch();
+			if(!this.$v.lampiran.jenis_lampiran.$invalid){
+				this.dokumen.fileLampiran.push({
+					jenis_file: this.lampiran.jenis_lampiran,
+					nama_file: this.lampiran.file_lampiran.name,
+					keterangan: this.lampiran.keterangan,
+					file: this.lampiran.file_lampiran
+				});
+				if(this.isEdit){
+					this.addToUploadList.push(
+						this.lampiran.file_lampiran.name,
+						'lampiran',
+						this.lampiran.file_lampiran,
+						this.lampiran.keterangan
+					);
+				}
+				this.clearLampiranForm();
+			}
 		},
 		warningFileSize(){
 			Swal.fire(
@@ -246,11 +332,12 @@ export default {
 			)
 		},
 		uploadFoto(){
-			this.dokumen.fileFotoPath = null;
+			this.$store.commit('SET_LOADING_STATE', true);
+			//this.dokumen.fileFotoPath = null;
 			const formData = new FormData();
 			formData.append('upload', this.dokumen.fileFoto);
 			formData.append('jenis_file', 'foto');
-			$axios.post('/uploadImageRegistration',
+			$axios.post('/uploadLampiran',
 				formData,
 				{
 					headers: {
@@ -259,22 +346,29 @@ export default {
 				}
 			)
 			.then((response)=> {
-				this.dokumen.fileFotoPath = response.data.url;
-				return true;
+				if(response.data.status == 'success'){
+					this.dokumen.fileFotoPath.push(response.data.url);
+					this.$store.commit('SET_LOADING_STATE', false);
+					this.dokumen.fileLampiranPath = [];
+					this.uploadLampiran(this.dokumen.fileLampiran);					
+				} else {
+					this.$store.commit('SET_LOADING_STATE', false);
+					return false;
+				}				
 			})
 			.catch(error => {
 				return false;
 			});
 		},
-		uploadLampiran(){
-			this.dokumen.fileLampiranPath = [];
+		uploadLampiran(files){
+			this.$store.commit('SET_LOADING_STATE', true);
 			var errors = 0;
-			for(var i=0;i<this.dokumen.fileLampiran.length;i++){
+			for(var i=0;i<files.length;i++){
 				const formData = new FormData();
-				formData.append('upload', this.dokumen.fileLampiran[i].file);
-				formData.append('jenis_file', this.lampiran.jenis_lampiran);
-				formData.append('nama_file', this.lampiran.file_lampiran.name);
-				formData.append('keterangan', this.lampiran.keterangan);
+				formData.append('upload', files[i].file);
+				formData.append('jenis_file', files[i].jenis_file);
+				//formData.append('nama_file', files[i].nama_file);
+				formData.append('keterangan', files[i].keterangan);
 				$axios.post('/uploadLampiran',
 					formData,
 					{
@@ -296,17 +390,48 @@ export default {
 				});
 			}
 			if(errors == 0){
+				this.$store.commit('SET_LOADING_STATE', false);
 				return true
 			} else {
-				for(var ii=0;ii<this.dokumen.fileLampiranPath.length;ii++){
+				for(var ii=0;ii<this.dokumen..length;ii++){
 					$axios.post('/hapusFileDokumen', {
 						'jenis_file' : 'lampiran',	
 						'filename' : this.dokumen.fileLampiranPath[ii].filename
 					})
 				}
+				this.$store.commit('SET_LOADING_STATE', false);
 				return false
 			}
 		},
+		addToUploadList(nama, jenis, file, keterangan){
+			this.fileToUpload.push({
+				nama_file: nama,
+				file: file,
+				jenis_file: jenis, //foto atau lampiran
+				keterangan: keterangan
+			});
+		},
+		addToDeleteList(id, nama, jenis){
+			this.fileToDelete.push({
+				nama_file: nama,
+				jenis_file: jenis //foto atau lampiran
+			});
+		},
+		removeFotoTemporary(){
+			this.addToDeleteList(
+				this.dokumen.fileFotoPath[0],
+				'lampiran'
+			);
+			this.dokumen.fileFotoPath = [];
+		},
+		removeLampiranTemporary(index){
+			this.addToDeleteList(
+				this.dokumen.fileLampiranPath[index].url,
+				'lampiran'
+			);
+			this.removeLampiran(index);
+			this.dokumen.fileLampiranPath.splice(index,1);
+		}
     }
 };
 </script>

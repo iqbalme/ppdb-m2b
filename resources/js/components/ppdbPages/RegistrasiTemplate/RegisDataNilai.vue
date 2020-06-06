@@ -188,6 +188,7 @@ import LTable from './../../themeComponents/Table.vue';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2';
 import $axios from '../../../api.js';
+import { mapState } from 'vuex';
 
 export default {
 	name: "regis-data-nilai",
@@ -251,7 +252,6 @@ export default {
 	validations: {
 		nilai : {
 			no_peserta_un: {
-				required,
 				numeric,
 				minLength: minLength(14),
 				maxLength: maxLength(16)
@@ -289,6 +289,9 @@ export default {
 	},
 	beforeMount() {
 	},
+	computed: {
+		...mapState(['loadingState']),
+	},
 	created() {
 		this.getMapel();
 	},
@@ -303,9 +306,12 @@ export default {
 				return false
 			} else {
 				var isValid = !this.$v.nilai.$invalid
-				this.$emit('on-validate', this.nilai, isValid)
-				return isValid
+				this.$emit('on-validate', this.nilai, true)
+				return true
 			}
+		},
+		appendValueFromParent(val){
+			this.nilai = val;		
 		},
 		validateModalPrestasi(){
 			this.$v.modal_prestasi.$touch(); //VALIDASI DIJALANKAN

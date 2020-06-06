@@ -16,9 +16,13 @@
         <i class="pe-7s-pen"></i>
         <p>Edit Info</p>
       </sidebar-link>
-      <sidebar-link to="/registrasi">
+      <sidebar-link to="/registrasi" v-if="!isAuth">
         <i class="nc-icon nc-tap-01"></i>
         <p>Registrasi</p>
+      </sidebar-link>
+	  <sidebar-link to="/input" v-if="isAuth">
+        <i class="nc-icon nc-tap-01"></i>
+        <p>Input</p>
       </sidebar-link>
       <sidebar-link to="/status">
         <i class="fab fa-searchengin"></i>

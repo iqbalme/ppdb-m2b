@@ -17,10 +17,11 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
     // return $request->user();
 // });
-Route::post('/images', 'funcController@uploadImage');
-Route::post('/uploadImageRegistration', 'funcController@uploadImageRegistration');
-Route::post('/uploadLampiran', 'funcController@uploadLampiran');
-Route::post('/hapusFileDokumen', 'funcController@hapusFileDokumen');
+Route::post('/images', 'funcController@uploadImage'); //upload foto di info
+Route::post('/uploadLampiran', 'funcController@uploadLampiran'); //upload lampiran atau foto
+Route::post('/hapusFileDokumen', 'funcController@hapusFileDokumen'); //hapus dokumen
+Route::post('/updateLampiranUser', 'funcController@updateLampiranUser'); //update lampiran db user
+Route::post('/hapusLampiranUser', 'funcController@hapusLampiranUser'); //hapus lampiran db user
 Route::get('/agama', 'funcController@agama');
 Route::get('/hobi', 'funcController@hobi');
 Route::get('/cita_cita', 'funcController@cita_cita');
@@ -38,7 +39,7 @@ Route::get('/kecamatan/{id}', 'funcController@kecamatan');
 Route::get('/kelurahan/{id}', 'funcController@kelurahan');
 Route::get('/transportasi', 'funcController@transportasi');
 Route::get('/jarak', 'funcController@jarak');
-Route::get('/jadwalppdb', 'funcController@jadwal_ppdb');
+Route::get('/jadwalppdb', 'funcController@jadwal_ppdb'); //jadwal ppdb
 Route::get('/pekerjaan', 'funcController@pekerjaan');
 Route::get('/pendidikan', 'funcController@pendidikan');
 Route::get('/penghasilan', 'funcController@penghasilan');
@@ -48,13 +49,15 @@ Route::get('/jumlah_lulus', 'funcController@jumlah_lulus');
 Route::post('/informasi', 'funcController@edit_informasi');
 Route::get('/informasi', 'funcController@info');
 Route::post('/registrasi', 'RegistrationController@submitRegistration'); //registrasi
+Route::post('/tesquery', 'RegistrationController@tesquery'); //tes query
 Route::post('/kirimAttachment', 'RegistrationController@kirimAttachment'); //kirim attachment
 Route::post('/suratpernyataansiswapdf', 'RegistrationController@suratPernyataanSiswa');
 Route::post('/suratpernyataanwalipdf', 'RegistrationController@suratPernyataanWali');
-Route::post('/afterregistrationsuccess', 'RegistrationController@afterRegistrationSukses'); //after sukses registration
-Route::post('/login', 'Auth\LoginController@login');
-Route::post('/cekstatus', 'funcController@status');
-Route::post('/updatestatus', 'funcController@updatestatus');
+Route::post('/afterregistrationsuccesspdf', 'RegistrationController@afterRegistrationSuksesPdf'); //after sukses registration return pdf
+Route::post('/afterregistrationsuccess', 'RegistrationController@afterRegistrationSukses'); //after sukses registration return data
+Route::post('/login', 'Auth\LoginController@login'); //login
+Route::post('/cekstatus', 'funcController@status'); //cek status
+Route::post('/updatestatus', 'funcController@updatestatus'); //update status
 Route::post('/kirimpesan', 'funcController@kirimpesan'); // kirim pesan dari kontak menu
 Route::post('/setwaktu', 'funcController@setwaktu');
 Route::get('/analytics-pv', 'funcController@getAnalytics');

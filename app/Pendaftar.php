@@ -23,7 +23,7 @@ class Pendaftar extends Model
     }	
 	
 	public function data_pendaftar(){
-        return $this->hasOne('App\DataPendaftar');
+        return $this->hasOne('App\DataPendaftar', 'pendaftar_id');
     }
 	
 	public function nilai_akademik(){

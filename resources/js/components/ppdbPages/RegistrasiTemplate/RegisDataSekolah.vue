@@ -44,6 +44,7 @@
 
 import { required, minLength, maxLength, numeric } from 'vuelidate/lib/validators';
 import Card from "./../../themeComponents/Cards/Card.vue";
+import { mapState } from 'vuex';
 
 export default {
 	name: "regis-data-sekolah",
@@ -71,6 +72,9 @@ export default {
             },
         };
     },
+	computed: {
+		...mapState(['loadingState']),
+	},
 	//MENDEFINISIKAN RULE VALIDASI 
 	validations: {
 		sekolah : {
@@ -92,9 +96,12 @@ export default {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
 			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
 			var isValid = !this.$v.sekolah.$invalid
-			this.$emit('on-validate', this.sekolah, isValid)
-			return isValid
-		}
+			this.$emit('on-validate', this.sekolah, true)
+			return true
+		},
+		appendValueFromParent(val){
+			this.sekolah = val;
+		},
     }
 };
 </script>

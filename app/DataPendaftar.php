@@ -8,7 +8,7 @@ class DataPendaftar extends Model
 {
     protected $table = 't_data_pendaftar';
     public $timestamps = false;
-    protected $guard = [];
+    protected $guarded = [];
 
     public function pendaftar(){
         return $this->belongsTo('App\Pendaftar');

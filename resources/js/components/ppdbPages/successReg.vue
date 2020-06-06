@@ -20,10 +20,31 @@
 							<p>Silakan cetak dan unduh dokumen di bawah ini.</p>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-md-10 offset-md-1 text-center">
-							<b-button variant="danger" class="btn-fill" @click="cetakKartu">CETAK KARTU REGISTRASI</b-button>
-							<b-button variant="warning" class="btn-fill" @click="cetakSuratPernyataan">UNDUH SURAT PERNYATAAN</b-button>
+					<div class="row" v-if="loading">
+						<div class="col-md-12 text-center p-5">
+						  <b-spinner style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
+						</div>
+					</div>
+					<div class="row" v-if="!loading && failed">
+						<div class="col-md-10 offset-md-1 text-center mb-3">
+							<b-button variant="danger" class="btn-block btn-fill" @click="makeDokumenPendaftar()">REFRESH</b-button>
+						</div>
+					</div>
+					<div  v-if="!loading & !failed">
+						<div class="row">
+							<div class="col-md-10 offset-md-1 text-center mb-3">
+								<b-button variant="danger" class="btn-block btn-fill" @click="forceFileDownload('kartu_reg')">CETAK KARTU REGISTRASI</b-button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-10 offset-md-1 text-center mb-3">
+								<b-button variant="secondary" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_siswa')">CETAK SURAT PERNYATAAN SISWA</b-button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-10 offset-md-1 text-center mb-3">
+								<b-button variant="warning" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_wali')">CETAK SURAT PERNYATAAN WALI</b-button>
+							</div>
 						</div>
 					</div>
 					<div class="row">
@@ -52,7 +73,9 @@ export default {
 	props: ['nama', 'no_reg', 'pin', 'email'],
     data() {
         return {
-			informasi: ''
+			informasi: '',
+			loading: false,
+			failed: false
 		}
     },
 	filters: {
@@ -68,38 +91,45 @@ export default {
 		}
 	},
 	created(){
-		
+		this.makeDokumenPendaftar();
+		//console.log('base url : ' + process.env.MIX_APP_URL);
 	},
     methods: {
-		cetakKartu(){
-			if(this.no_reg==null){
-				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
+		forceFileDownload(tipe){
+			var kartu_reg = 'Kartu_Registrasi_No_' + this.no_reg;
+			var surat_pernyataan_siswa = 'Surat_Pernyataan_Siswa_NoRegistrasi_' + this.no_reg;
+			var surat_pernyataan_wali = 'Surat_Pernyataan_Wali_NoRegistrasi_' + this.no_reg;
+			var file = '';
+			if(tipe == 'kartu_reg'){
+				file = kartu_reg;
+			} else if(tipe== 'surat_pernyataan_siswa'){
+				file = surat_pernyataan_siswa;
 			} else {
-				
+				file = surat_pernyataan_wali;
 			}
+			//const url = window.URL.createObjectURL(new Blob([response.data]))
+			const link = document.createElement('a')
+			link.href = process.env.MIX_APP_URL + '/storage/attachment/'+file+'.pdf' //mau diubah base urlnya
+			link.setAttribute('download', file+'.pdf') //or any other extension
+			document.body.appendChild(link)
+			link.click()
 		},
-		cetakSuratPernyataan(){
-			if(this.no_reg==null){
-				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
-			} else {
-				if(!this.email==null){ //jika tidak ada emailnya
-					
-				} else {
-					
-				}
-			}
-		},
-		getSuratPernyataanSiswa(no_reg) {
-		  $axios
-			.post('/afterregistrationsuccess', {no_registrasi: no_reg})
+		makeDokumenPendaftar(){
+			this.loading = true;
+			$axios.post('/afterregistrationsuccesspdf', {no_registrasi: this.no_reg})
 			.then((response)=> {
-			  var res = response.data;
-				if(res.status=='success'){
-					this.modalBox('Berhasil', 'Update data berhasil!', 'success');
+				this.loading = false;
+				var res = response.data;
+				if(res.status == 'success'){
+					this.failed = false
+				} else {
+					this.failed = true
 				}
 			})
 			.catch(error => {
-			  this.modalBox('Gagal', 'Gagal update kelas. Silakan coba lagi!', 'warning');
+				this.loading = false;
+				this.failed = true;
+				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
 			});
 		},
 		modalBox(header, msg, icon){

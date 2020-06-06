@@ -15,6 +15,7 @@ use App\PendaftarKelas;
 use App\Pendidikan;
 use App\Penghasilan;
 use App\Hubungan;
+use App\Lampiran;
 use App\Wilayah;
 use App\Mapel;
 use App\Info;
@@ -61,54 +62,24 @@ class funcController extends Controller
         }
     }
 	
-	public function uploadImageRegistration(Request $request)
+	public function uploadLampiran(Request $request)
     {
         if ($request->hasFile('upload')) {
             try {
                 $file = $request->file('upload'); //SIMPAN SEMENTARA FILENYA KE VARIABLE
-                $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME); //KITA GET ORIGINAL NAME-NYA
-                //KEMUDIAN GENERATE NAMA YANG BARU KOMBINASI NAMA FILE + TIME
-                $fileName = $fileName . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-				if($request->jenis_file == 'foto'){
-					$temp_path = 'uploads/foto';
-				} else {
-					$temp_path = 'uploads/lampiran';
-				}
-                $file->move(public_path($temp_path), $fileName); //SIMPAN KE DALAM FOLDER PUBLIC/UPLOADS
-				$url = asset($temp_path.'/' . $fileName);				
-
-                $response = response()->json(["status" => "success", "url" => $url, "fileName" => $fileName]);
-            } catch (Exception $e) {
-                $response = response()->json(["status" => "error", "error" => ["message" => $e]]);
-            }
-            //SET HEADERNYA
-            @header('Content-type: application/json; charset=utf-8');
-            return $response;
-        }
-    }
-	
-		public function uploadLampiran(Request $request)
-    {
-        if ($request->hasFile('upload')) {
-            try {
-                $file = $request->file('upload'); //SIMPAN SEMENTARA FILENYA KE VARIABLE
-                $fileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME); //KITA GET ORIGINAL NAME-NYA
-                //KEMUDIAN GENERATE NAMA YANG BARU KOMBINASI NAMA FILE + TIME
-                $fileName = $fileName . '_' . time() . '.' . $file->getClientOriginalExtension();
 				$jenis_file = $request->input('jenis_file');
-				$keterangan = $request->input('keterangan');
+				$keterangan = $request->input('keterangan') ? $request->input('keterangan') : null;
 				if($request->jenis_file == 'foto'){
-					$temp_path = 'uploads/foto';
+					$temp_path = 'public/foto/';
 				} else {
-					$temp_path = 'uploads/lampiran';
+					$temp_path = 'public/lampiran/';
 				}
-                $file->move(public_path($temp_path), $fileName); //SIMPAN KE DALAM FOLDER PUBLIC/UPLOADS
-				$url = asset($temp_path.'/' . $fileName);				
-
-                $response = response()->json(["status" => "success", "url" => $url, "fileName" => $fileName, "jenis_file" => $jenis_file, "keterangan" => $keterangan]);
+				$path = $file->store($temp_path);
+				$fileName = ltrim($path, $temp_path);
+				$full_path = Storage::url($path);
+				$response = response()->json(["status" => "success", "url" => $full_path, "fileName" => $fileName, "jenis_file" => $jenis_file, "keterangan" => $keterangan]);
             } catch (Exception $e) {
-                $response = response()->json(["status" => "error", "error" => ["message" => $e]]);
+                $response = response()->json(["status" => "error", "message" => $e]);
             }
             //SET HEADERNYA
             @header('Content-type: application/json; charset=utf-8');
@@ -117,17 +88,39 @@ class funcController extends Controller
     }
 	
 	public function hapusFileDokumen(Request $request){
-		$path = public_path().'/uploads/'.$request->jenis_file.'/'.$request->filename;
-		// hapus file
-		try{			
-			unlink($path);
-			$response = response()->json(["status" => "success", "message" => "berhasil"]);
+		$file = '/public/'.$request->jenis_file.'/'.$request->filename;
+		Storage::delete($file);
+	}
+	
+	public function updateLampiranUser(Request $request){
+		try{
+			Lampiran::updateOrCreate(['pendaftar_id' => $request->id],[
+				'nama_file' => $request->input('nama_file'),
+				'path' => $request->input('path'),
+				'jenis_file' => $request->input('jenis_file'),
+				'keterangan' => $request->input('keterangan')
+			]);
+			$response = response()->json(["status" => "success"]);
 		} catch (Exception $e) {
-			//$response = $e->errorInfo[1];
-			$response = response()->json(["status" => "error", "error" => ["message" => $e]]);
+			$response = response()->json(["status" => "error", "message" => $e]);
 		}
 		return $response;
-	}
+	}	
+	
+	public function hapusLampiranUser(Request $request){
+		try{
+			$lampiran = Lampiran::where(['nama_file' => $request->input('nama_file')]);
+			if($lampiran->count()>0){
+				$lampiran->first()->delete();
+				$response = response()->json(["status" => "success"]);
+			} else {
+				$response = response()->json(["status" => "error"]);
+			}			
+		} catch (Exception $e) {
+			$response = response()->json(["status" => "error", "message" => $e]);
+		}
+		return $response;
+	}	
 	
 	public function jumlah_pendaftar(){
 		$jml = DB::table('t_pendaftar')->count();
@@ -262,7 +255,9 @@ class funcController extends Controller
 				'status' => $status_pendaftar[$i]->status
 			]);
 		}
-		return response()->json($data);
+		$unique_data = array_unique($data, SORT_REGULAR);
+		//return $unique_data;
+		return response()->json($unique_data);
 	}
 	
 	public function updatestatus(Request $request){

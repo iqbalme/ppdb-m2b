@@ -22,7 +22,9 @@ const store = new Vuex.Store({
 		waktu: {
 			// mulai: null,
 			// akhir: null
-		}
+		},
+		loadingState: false,
+		isEdit: false //for state in editing form
     },
     getters: {
         //KITA MEMBUAT SEBUAH GETTERS DENGAN NAMA isAuth
@@ -48,6 +50,12 @@ const store = new Vuex.Store({
         },
 		SET_WAKTU(state, payload) {
             state.waktu = payload
+        },
+		SET_LOADING_STATE(state, payload) {
+            state.loadingState = payload
+        },
+		SET_EDIT_STATE(state, payload) {
+            state.isEdit = payload
         },
     }
 })

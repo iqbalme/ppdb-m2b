@@ -8,8 +8,8 @@
 							CETAK DOKUMEN
 						</div>
 						
-						<div class="row"  v-if="loading">
-							<div class="col-md-12 text-center">
+						<div class="row" v-if="loading">
+							<div class="col-md-12 text-center p-5">
 							  <b-spinner style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
 							</div>
 						</div>
@@ -18,7 +18,7 @@
 								<b-button variant="danger" class="btn-block btn-fill" @click="makeDokumenPendaftar()">REFRESH</b-button>
 							</div>
 						</div>
-						<div  v-if="!loading">
+						<div  v-if="!loading && !failed">
 						<div class="row">
 							<div class="col-md-10 offset-md-1 text-center mb-3">
 								<b-button variant="danger" class="btn-block btn-fill" @click="forceFileDownload('kartu_reg')">CETAK KARTU REGISTRASI</b-button>
@@ -47,6 +47,7 @@
 import Card from "./../themeComponents/Cards/Card.vue";
 import { mapActions, mapMutations, mapGetters, mapState } from 'vuex';
 import $axios from '../../api.js';
+import Swal from 'sweetalert2'
 
 export default {
 	name: "Status",
@@ -81,14 +82,14 @@ export default {
 			}
 			//const url = window.URL.createObjectURL(new Blob([response.data]))
 			const link = document.createElement('a')
-			link.href = 'http://ppdb.ccom/storage/attachment/'+file+'.pdf'
+			link.href = process.env.MIX_APP_URL + '/storage/attachment/'+file+'.pdf' //mau diubah base urlnya
 			link.setAttribute('download', file+'.pdf') //or any other extension
 			document.body.appendChild(link)
 			link.click()
 		},
 		makeDokumenPendaftar(){
 			this.loading = true;
-			$axios.post('/afterregistrationsuccess', {no_registrasi: this.no_reg})
+			$axios.post('/afterregistrationsuccesspdf', {no_registrasi: this.no_reg})
 			.then((response)=> {
 				this.loading = false;
 				var res = response.data;
@@ -100,8 +101,16 @@ export default {
 			})
 			.catch(error => {
 				this.loading = false;
+				this.failed = true;
 				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
 			});
+		},
+		modalBox(header, msg, icon){
+			Swal.fire(
+			  header,
+			  msg,
+			  icon
+			)
 		},
     },
 };
