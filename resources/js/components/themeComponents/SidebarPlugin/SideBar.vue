@@ -35,6 +35,7 @@
 </template>
 <script>
   import SidebarLink from './SidebarLink.vue'
+  import { mapState } from 'vuex';
 
   export default {
     components: {
@@ -88,7 +89,8 @@
       this.logoImg = this.getfoto();
     },
     computed: {
-      sidebarStyle () {
+      ...mapState(['app_setting']),
+	  sidebarStyle () {
         return {
           backgroundImage: `url(${this.backgroundImage})`
         }

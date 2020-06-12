@@ -15,10 +15,16 @@
 			@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,400;0,700;1,400&family=Martel+Sans:wght@300;700&family=Roboto:ital,wght@0,100;0,300;0,500;0,700;1,100;1,300&display=swap');
 			table { font-family: Bitter, Roboto;font-size:12px; }
 			table tr td{border-color:inherit;vertical-align:top}
+			.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+			.tg td{background-color:#fff;border-color:black;border-style:solid;border-width:0px;color:#333;
+			  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:3px 5px;word-break:normal;}
+			.bold { font-weight: bold; }
+			.text-center { text-align: center; }
+			.vmiddle { vertical-align:middle; }
         </style>
     </head>
     <body>
-		<table style="width:100%;" >
+		<table style="width:100%;" class="tg">
 		<thead>
 		  <tr>
 			<th style="width:5%"></th>
@@ -34,11 +40,13 @@
 		</thead>
 		<tbody>
 		  <tr>
-			<td colspan="4">Lampiran 1<br></td>
-			<td colspan="5">Barcode<br></td>
+			<td colspan="9">Lampiran 1<br></td>
 		  </tr>
 		  <tr>
-			<td colspan="9"><center><strong>SURAT PERNYATAAN CALON PESERTA DIDIK BARU</strong></center><br></td>
+			<td colspan="9"><center><strong>SURAT PERNYATAAN CALON PESERTA DIDIK BARU</strong></center></td>
+		  </tr>
+		  <tr>
+			<td colspan="9" height="6px"></td>
 		  </tr>
 		  <tr>
 			<td colspan="9">Yang bertanda tangan di bawah ini :</td>
@@ -101,7 +109,7 @@
 			<td></td>
 			<td>9.</td>
 			<td>Pekerjaan Orang Tua</td>
-			<td colspan="6">: {{ $data_pendaftar['pekerjaan_ayah']['pekerjaan'] }}</td>
+			<td colspan="6">: {{ $data_pendaftar['pekerjaan_ayah']['pekerjaan'] ?: '-' }}</td>
 		  </tr>
 		  <tr>
 			<td></td>
@@ -137,7 +145,7 @@
 			<td></td>
 			<td>15.</td>
 			<td>No. Telepon/HP</td>
-			<td colspan="6">: {{ $data_pendaftar['no_hp_wali'] }}</td>
+			<td colspan="6">: {{ $data_pendaftar['no_hp_wali'] ?: '-' }}</td>
 		  </tr>
 		  <tr>
 			<td colspan="9">Dengan ini kami menyatakan dengan sesungguhnya,bahwa selama di Madrasah ini,</td>
@@ -171,8 +179,7 @@
 			<td colspan="9">Demikian surat pernyataan ini kami buat dengan sebenarnya, dan penuh rasa tanggung jawab.</td>
 		  </tr>
 		  <tr>
-			<td colspan="9">
-				<br>
+			<td colspan="9" style="height="7px">
 			</td>
 		  </tr>
 		  <tr>
@@ -189,8 +196,7 @@
 			<td colspan="4">Yang membuat pernyataan,</td>
 		  </tr>
 		  <tr>
-			<td colspan="9">
-				<br>
+			<td colspan="9" style="height:7px">
 			</td>
 		  </tr>
 		  <tr>
@@ -211,6 +217,15 @@
 			<td></td>
 			<td colspan="4"><strong>({{ $data_pendaftar['nama_wali'] }})</strong></td>
 			<td colspan="4"><strong>({{ $nama_lengkap }})</strong></td>
+		  </tr>
+		  <tr>
+			<td colspan="9" style="height:7px"></td>
+		  </tr>
+		  <tr>
+			<td colspan="7"></td>
+			<td colspan="2" style="text-align:right">
+			{!!DNS2D::getBarcodeHTML(env('APP_URL').'/status/'.$status_pendaftar['noRegistrasi'], 'QRCODE',2,2)!!}
+			</td>
 		  </tr>
 		</tbody>
 		</table>

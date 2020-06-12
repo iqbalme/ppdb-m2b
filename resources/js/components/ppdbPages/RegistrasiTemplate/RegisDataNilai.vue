@@ -38,11 +38,6 @@
 					<br>
 				</div>
 				<b-table hover fixed striped :items="nilai.nilai_akademik" :fields="fieldsNilai" responsive="sm" v-if="nilai.nilai_akademik.length>0">
-					<!--template v-slot:cell(keterangan)="data">
-					<div class="col-md-2">
-						<input type="text" v-model="$data['options.keterangan_id'+data.item.id]">
-					</div>
-					</template-->
 					<template v-slot:cell(edit)="data">
 					<div class="col-md-2" :key="data.item.id">
 						<b-button variant="primary" class="btn-fill" @click="openFormNilaiAkademik(data.item.id)"><b-icon icon="pencil"></b-icon></b-button>
@@ -285,12 +280,8 @@ export default {
 			}
 		}
 	},
-	mounted() {
-	},
-	beforeMount() {
-	},
 	computed: {
-		...mapState(['loadingState']),
+		...mapState(['loadingState', 'isEdit']),
 	},
 	created() {
 		this.getMapel();
@@ -374,6 +365,7 @@ export default {
 			//input the value
 			if(this.modal_prestasi.id==null){
 			this.nilai.prestasi_non_akademik.push({
+				id: null,
 				jenis_lomba: this.modal_prestasi.jenis_lomba,
 				tempat_pelaksanaan: this.modal_prestasi.tempat_pelaksanaan,
 				tingkat: this.modal_prestasi.tingkat,
@@ -424,7 +416,7 @@ export default {
 			return index;
 		},
 		getMapel() {
-			if(this.nilai.nilai_akademik.length == 0){
+			if(this.nilai.nilai_akademik.length == 0 && !this.isEdit){
 			  $axios.get('/mapel')
 				.then((response)=> {
 				  var items = response.data;
@@ -452,7 +444,7 @@ export default {
 				  }
 				})
 				.catch(error => {
-				  console.log(error);
+				  //console.log(error);
 				});
 			}
 		},

@@ -15,7 +15,7 @@ class CreateTJarak extends Migration
     {
         Schema::create('t_jarak', function (Blueprint $table) {
             $table->id();
-            $table->string('jarak');
+            $table->string('jarak')->unique();
         });
     }
 

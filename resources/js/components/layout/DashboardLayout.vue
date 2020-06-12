@@ -12,10 +12,6 @@
         <i class="nc-icon nc-notes"></i>
         <p>Informasi</p>
       </sidebar-link>
-	  <sidebar-link to="/info/edit" v-if="isAuth">
-        <i class="pe-7s-pen"></i>
-        <p>Edit Info</p>
-      </sidebar-link>
       <sidebar-link to="/registrasi" v-if="!isAuth">
         <i class="nc-icon nc-tap-01"></i>
         <p>Registrasi</p>
@@ -28,13 +24,13 @@
         <i class="fab fa-searchengin"></i>
         <p>Cek Status</p>
       </sidebar-link>
+	  <sidebar-link to="/pengaturan" v-if="isAuth">
+        <i class="fas fa-cogs"></i>
+        <p>Pengaturan</p>
+      </sidebar-link>
       <sidebar-link to="/kontak">
         <i class="nc-icon nc-send"></i>
         <p>Kontak</p>
-      </sidebar-link>
-	  <sidebar-link to="/waktu" v-if="isAuth">
-        <i class="pe-7s-alarm"></i>
-        <p>Atur Waktu</p>
       </sidebar-link>
 	  <li>
 	  <a href="https://man2bulukumba.sch.id" target="_blank" class="nav-link">

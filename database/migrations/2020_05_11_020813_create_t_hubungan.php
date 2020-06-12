@@ -15,7 +15,7 @@ class CreateTHubungan extends Migration
     {
         Schema::create('t_hubungan', function (Blueprint $table) {
             $table->id();
-            $table->string('hubungan'); //ayah, ibu, saudara, dll
+            $table->string('hubungan')->unique(); //ayah, ibu, saudara, dll
         });
     }
 

@@ -15,7 +15,7 @@ class CreateTMapel extends Migration
     {
         Schema::create('t_mapel', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_mapel');
+            $table->string('nama_mapel')->unique();
         });
     }
 

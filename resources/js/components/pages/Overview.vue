@@ -168,11 +168,14 @@
 		this.getValidated();
 		this.getLulus();
 		this.getVisitors();
+		this.getSetting();
 		//this.getPageViews();
 		//this.getBrowser();
 		// this.barChart.data.series[0].push(15);
 		// this.barChart.data.series[0].push(45);
-		// this.barChart.data.series[0].push(32);
+		// this.barChart.data.series[0].push(32);		
+	},
+	mounted(){
 		this.barChart.data.series[0].push(this.pendaftar);
 		this.barChart.data.series[0].push(this.j_validated);
 		this.barChart.data.series[0].push(this.lulus);
@@ -203,6 +206,26 @@
 				this.pageViews = items.data;
 			  }
 			});
+		},
+		getsetting() {
+			  $axios
+				.get('/setting')
+				.then((response)=> {
+				  var items = response.data;
+				  this.setting = [];
+				  for (var i = 0; i < items.length; i++) {
+					this.$store.commit('SET_APP_SETTING', {
+						id : items[i].id,
+						setting: items[i].nama_setting,
+						value: items[i].value
+					});
+				  }
+				})
+				.catch(error => {
+					if(this.data.length==0){
+						this.getsetting();
+					}
+				});
 		},
 		getPendaftar() {
 		  axios

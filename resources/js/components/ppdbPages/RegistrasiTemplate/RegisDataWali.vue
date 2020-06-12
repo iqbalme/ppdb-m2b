@@ -248,7 +248,6 @@ export default {
 	validations: {
 		wali : {
 			no_kk: {
-				required,
 				numeric,
 				minLength: minLength(16),
 				maxLength: maxLength(16)
@@ -434,13 +433,13 @@ export default {
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
 			}
 		},
-		// comp_hubungan_wali(){
-			// if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ayah')){
-				// this.wali_is_ayah = true;
-			// } else if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ibu')){
-				// this.wali_is_ibu = true;
-			// }
-		// }
+		comp_hubungan_wali(){
+			if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ayah')){
+				this.wali_is_ayah = true;
+			} else if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ibu')){
+				this.wali_is_ibu = true;
+			}
+		}
 	},
 	computed: {
 		...mapState(['loadingState']),
@@ -481,7 +480,9 @@ export default {
 			return this.wali.no_hp_ibu;
 		},
 		comp_hubungan_wali(){
-			return this.wali.hubungan_dengan_wali;
+			if(this.wali.hubungan_dengan_wali != null){
+				return this.wali.hubungan_dengan_wali;
+			}			
 		}
 	},
     methods: {
@@ -598,8 +599,10 @@ export default {
 			return index;
 		},
 		getIndexHubungan(val){
-			var index = this.options.list_hubungan[this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true)].value;
-			return index;
+			if(this.options.list_hubungan.length>0){
+				var index = this.options.list_hubungan[this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true)].value;
+				return index;
+			}			
 		},
 		resetWaliElement(){
 			this.wali.nama_lengkap_wali = '';

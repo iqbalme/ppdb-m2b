@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFuncTriggerAvg extends Migration
+class CreateFuncTriggerAvgUpdate extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateFuncTriggerAvg extends Migration
      */
     public function up()
     {
-        Schema::dropIfExists('DROP TRIGGER `calc_avg_nilai_akademik`');
+        Schema::dropIfExists('DROP TRIGGER `calc_avg_nilai_akademik_update`');
         DB::unprepared('
-            CREATE TRIGGER calc_avg_nilai_akademik
+            CREATE TRIGGER calc_avg_nilai_akademik_update
 			BEFORE UPDATE ON `t_nilai_akademik` FOR EACH ROW
             BEGIN
 			SET	NEW.avg = ((NEW.semester1+NEW.semester2+NEW.semester3+NEW.semester4+NEW.semester5)/5);
@@ -29,6 +29,6 @@ class CreateFuncTriggerAvg extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('DROP TRIGGER `calc_avg_nilai_akademik`');
+        Schema::dropIfExists('DROP TRIGGER `calc_avg_nilai_akademik_update`');
     }
 }

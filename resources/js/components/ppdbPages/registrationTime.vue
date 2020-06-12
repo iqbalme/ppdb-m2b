@@ -26,6 +26,7 @@
 					</div>
 					<div class="col-md-6">
 						<div class="form-group">
+							<label class="control-label">
 								WAKTU AKHIR
 							</label>
 							<div class="form-group input-group">

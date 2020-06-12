@@ -44,12 +44,6 @@
 			</div>
 			</div>
 			<div class="row">
-			<div class="col-md-2">
-				<div class="form-group">
-					<label class="control-label">Jenis Kelamin</label>
-					<b-form-select v-model="siswa.jenis_kelamin" :options="options.list_jenis_kelamin" :class="{'is-invalid': $v.siswa.jenis_kelamin.$error}"></b-form-select>
-				</div>
-			</div>
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Hobi</label>
@@ -270,15 +264,13 @@ export default {
 		},
 	},
 	mounted() {
-		
-		this.getHobi();
-		this.getCita();
-		this.getAgama();
-		this.getPropinsi();
-		this.getTransportasi();
-		this.getJarak();
-		this.getJenisTinggal();
-		
+		this.getHobi(),
+		this.getCita(),
+		this.getAgama(),
+		this.getPropinsi(),
+		this.getTransportasi(),
+		this.getJarak(),
+		this.getJenisTinggal()
 	},
 	computed: {
 		...mapState(['isEdit', 'loadingState']),
@@ -318,6 +310,7 @@ export default {
 				})
 				.catch(error => {
 				  //console.log(error);
+				  this.getTransportasi();
 				});
 			}
 		},
@@ -338,7 +331,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getJarak();
 				  //console.log(error);
 				});
 			}
@@ -360,7 +353,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getHobi();
 				  //console.log(error);
 				});
 			}
@@ -382,7 +375,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getCita();
 				  //console.log(error);
 				});
 			}
@@ -404,7 +397,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getAgama();
 				  //console.log(error);
 				});
 			}
@@ -426,7 +419,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getPropinsi();
 				  //console.log(error);
 				});
 			}
@@ -447,7 +440,7 @@ export default {
 			  
 			})
 			.catch(error => {
-				
+				this.getKabupaten();
 			  //console.log(error);
 			});
 		},
@@ -467,29 +460,30 @@ export default {
 			  
 			})
 			.catch(error => {
-				
+				this.getKecamatan();
 			  //console.log(error);
 			});
 		},
 		getKelurahan(id) {
-			
-		  $axios
-			.get('/kelurahan/'+id)
-			.then((response)=> {
-			  var items = response.data;
-			  this.options.list_kelurahan = [];
-			  for (var i = 0; i < items.length; i++) {
-				this.options.list_kelurahan.push({
-					value : items[i].kode,
-					text: items[i].nama
+			if((id != null) || (id != undefined)){			
+			  $axios
+				.get('/kelurahan/'+id)
+				.then((response)=> {
+				  var items = response.data;
+				  this.options.list_kelurahan = [];
+				  for (var i = 0; i < items.length; i++) {
+					this.options.list_kelurahan.push({
+						value : items[i].kode,
+						text: items[i].nama
+					});
+				  }
+				  
+				})
+				.catch(error => {
+					this.getKelurahan();
+				  //console.log(error);
 				});
-			  }
-			  
-			})
-			.catch(error => {
-				
-			  //console.log(error);
-			});
+			}
 		},
 		getJenisTinggal(id) {
 			if(this.options.list_jenis_tinggal.length == 0){
@@ -508,7 +502,7 @@ export default {
 				  
 				})
 				.catch(error => {
-					
+					this.getJenisTinggal();
 				  //console.log(error);
 				});
 			}

@@ -18,6 +18,10 @@ class Pendaftar extends Model
         return $this->belongsTo('App\Hobi');
     }	
 	
+	public function tahun_ajaran_pendaftar(){
+        return $this->hasOne('App\TahunAjaranPendaftar', 'pendaftar_id');
+    }
+	
 	public function cita_cita(){
         return $this->belongsTo('App\CitaCita');
     }	
@@ -32,6 +36,14 @@ class Pendaftar extends Model
 	
 	public function prestasi_non_akademik(){
         return $this->hasMany('App\Prestasi');
+    }
+	
+	public function peminatan_siswa(){
+        return $this->hasMany('App\PeminatanSiswa');
+    }
+	
+	public function peminatan(){
+        return $this->hasManyThrough('App\Peminatan', 'App\PeminatanSiswa', 'pendaftar_id', 'id');
     }
 	
 	public function lampiran(){

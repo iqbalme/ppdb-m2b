@@ -18,7 +18,7 @@ class CreateTableLampiran extends Migration
 			$table->bigInteger('pendaftar_id')->unsigned();
             $table->foreign('pendaftar_id')->on('t_pendaftar')->references('id')->delete('cascade');
             $table->string('nama_file');
-			$table->string('path');
+			$table->string('path')->unique();
 			$table->string('jenis_file');
 			$table->string('keterangan')->nullable();
         });

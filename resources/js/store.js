@@ -24,7 +24,8 @@ const store = new Vuex.Store({
 			// akhir: null
 		},
 		loadingState: false,
-		isEdit: false //for state in editing form
+		isEdit: false, //for state in editing form
+		app_setting: []
     },
     getters: {
         //KITA MEMBUAT SEBUAH GETTERS DENGAN NAMA isAuth
@@ -57,6 +58,9 @@ const store = new Vuex.Store({
 		SET_EDIT_STATE(state, payload) {
             state.isEdit = payload
         },
+		SET_APP_SETTING(state, payload) {
+            state.app_setting.push(payload)
+        }	
     }
 })
 

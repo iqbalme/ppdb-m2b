@@ -22,6 +22,7 @@ import RegisDataNilai from './../components/ppdbPages/RegistrasiTemplate/RegisDa
 import RegisDataKonfirmasi from './../components/ppdbPages/RegistrasiTemplate/RegisDataKonfirmasi.vue';
 import Submit from './../components/ppdbPages/tesSubmit.vue';
 import Cetak from './../components/ppdbPages/Cetak.vue';
+import Pengaturan from './../components/ppdbPages/Pengaturan.vue';
 import inputEditPendaftar from './../components/ppdbPages/inputEditPendaftar.vue';
 import pendaftarView from './../components/ppdbPages/pendaftarView.vue';
 
@@ -80,9 +81,9 @@ const routes = [
 		//meta: { requiresAuth: true }
       },
 	  {
-        path: 'waktu',
-        name: 'registrationTime',
-        component: registrationTime,
+        path: 'pengaturan',
+        name: 'Pengaturan',
+        component: Pengaturan,
 		meta: { requiresAuth: true }
       },
 	  {
@@ -93,7 +94,7 @@ const routes = [
 		props: true,
       },
 	  {
-        path: 'pendaftar/:no_reg',
+        path: 'status/:no_reg',
         name: 'pendaftarView',
         component: pendaftarView,
 		props: true,
@@ -128,7 +129,19 @@ const routes = [
 		  },
 	]
   },
-  { path: '*', component: NotFound }
+  //{ path: '*', component: NotFound }
+  { 
+	path: '*', 
+	component: DashboardLayout,
+    redirect: '/notfound',
+	children: [
+		{
+			path: '/',
+			name: 'NotFound',
+			component: NotFound
+		}
+	]
+  }
 ]
 
 /**

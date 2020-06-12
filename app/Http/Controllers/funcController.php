@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use App\Agama;
 use App\Hobi;
 use App\Kelas;
+use App\Setting;
 use App\CitaCita;
+use App\TahunAjaran;
+use App\TahunAjaranPendaftar;
 use App\JenisTinggal;
 use App\Transportasi;
 use App\Jarak;
@@ -15,6 +18,7 @@ use App\PendaftarKelas;
 use App\Pendidikan;
 use App\Penghasilan;
 use App\Hubungan;
+use App\Peminatan;
 use App\Lampiran;
 use App\Wilayah;
 use App\Mapel;
@@ -62,6 +66,20 @@ class funcController extends Controller
         }
     }
 	
+	//upload foto
+	public function uploadFoto(Request $request){
+		try{
+			$foto = $request->file('foto');
+			$foto_path = $foto->store('public/temporary/foto');
+			$response = response()->json(["status" => "success", "url" => $foto_path]);
+		} catch (Exception $e) {
+			$response = response()->json(["status" => "error", "message" => $e]);
+		}
+		//SET HEADERNYA
+		@header('Content-type: application/json; charset=utf-8');
+		return $response;
+	}
+	
 	public function uploadLampiran(Request $request)
     {
         if ($request->hasFile('upload')) {
@@ -69,58 +87,41 @@ class funcController extends Controller
                 $file = $request->file('upload'); //SIMPAN SEMENTARA FILENYA KE VARIABLE
 				$jenis_file = $request->input('jenis_file');
 				$keterangan = $request->input('keterangan') ? $request->input('keterangan') : null;
-				if($request->jenis_file == 'foto'){
-					$temp_path = 'public/foto/';
-				} else {
-					$temp_path = 'public/lampiran/';
-				}
-				$path = $file->store($temp_path);
-				$fileName = ltrim($path, $temp_path);
-				$full_path = Storage::url($path);
-				$response = response()->json(["status" => "success", "url" => $full_path, "fileName" => $fileName, "jenis_file" => $jenis_file, "keterangan" => $keterangan]);
+				$path = $file->store('public/temporary/lampiran');
+				$response = response()->json(["status" => "success", "url" => $path]);
             } catch (Exception $e) {
                 $response = response()->json(["status" => "error", "message" => $e]);
             }
             //SET HEADERNYA
             @header('Content-type: application/json; charset=utf-8');
             return $response;
-        }
+        } else {
+			return response()->json(["status" => "error"]);
+		}
     }
 	
-	public function hapusFileDokumen(Request $request){
-		$file = '/public/'.$request->jenis_file.'/'.$request->filename;
-		Storage::delete($file);
+	public function hapusFile(Request $request){
+		$file = $request->input('file');
+		if(Storage::exists($file)){
+			Storage::delete($file);
+		}		
 	}
 	
-	public function updateLampiranUser(Request $request){
+	public function hapusFileBerkala(Request $request){ // toleransi waktu hapus 15 jam
 		try{
-			Lampiran::updateOrCreate(['pendaftar_id' => $request->id],[
-				'nama_file' => $request->input('nama_file'),
-				'path' => $request->input('path'),
-				'jenis_file' => $request->input('jenis_file'),
-				'keterangan' => $request->input('keterangan')
-			]);
-			$response = response()->json(["status" => "success"]);
-		} catch (Exception $e) {
-			$response = response()->json(["status" => "error", "message" => $e]);
+			$prefix_path = 'public/temporary/';
+			$list = Storage::allFiles($prefix_path);
+			foreach($list as $file){
+				$last_modified = Storage::lastModified($file);
+				if((time()-$last_modified)>10800){ //1 menit = 60 // 15 jam kemudian
+					Storage::delete($file);
+				}
+			}
+			return response()->json(['status' => 'success']);
+		} catch(Exception $e){
+			return response()->json(['status' => 'error']);
 		}
-		return $response;
-	}	
-	
-	public function hapusLampiranUser(Request $request){
-		try{
-			$lampiran = Lampiran::where(['nama_file' => $request->input('nama_file')]);
-			if($lampiran->count()>0){
-				$lampiran->first()->delete();
-				$response = response()->json(["status" => "success"]);
-			} else {
-				$response = response()->json(["status" => "error"]);
-			}			
-		} catch (Exception $e) {
-			$response = response()->json(["status" => "error", "message" => $e]);
-		}
-		return $response;
-	}	
+	}
 	
 	public function jumlah_pendaftar(){
 		$jml = DB::table('t_pendaftar')->count();
@@ -134,6 +135,7 @@ class funcController extends Controller
 	
 	public function jumlah_lulus(){
 		$jml = StatusPendaftar::where('status', 3)->count();
+		
 		return response()->json(['lulus' => $jml]);
 	}
 
@@ -142,20 +144,114 @@ class funcController extends Controller
 		return Agama::orderBy('id', 'asc')->get();
     }
 
+	public function setting(){
+        return Setting::all();
+    }
+	
+	public function simpanSetting(Request $request){
+        $id = $request->input('id');
+		$setting = $request->input('setting');
+		$value = $request->input('value');
+		if($id==null){
+			$res = Setting::create(['nama_setting' => $setting]);
+		} else {
+			$res = Setting::updateOrCreate(['id' => $id], ['nama_setting' => $setting, 'value' => $value]);
+		}
+		return $res;
+    }
+	
+	public function hapusSetting($id){
+        $setting = Setting::find($id);
+		$res = $setting->delete();
+		return $res;
+    }
+
     public function hobi(){
         return Hobi::all();
+    }
+	
+	public function simpanHobi(Request $request){
+        $id = $request->input('id');
+		$hobi = $request->input('hobi');
+		if($id==null){
+			$res = Hobi::create(['hobi' => $hobi]);
+		} else {
+			$res = Hobi::updateOrCreate(['id' => $id], ['hobi' => $hobi]);
+		}
+		return $res;
+    }
+	
+	public function hapusHobi($id){
+        $hobi = Hobi::find($id);
+		$res = $hobi->delete();
+		return $res;
     }
 
     public function cita_cita(){
         return CitaCita::all();
     }
+	
+	public function simpanCita(Request $request){
+        $id = $request->input('id');
+		$cita_cita = $request->input('cita_cita');
+		if($id==null){
+			$res = CitaCita::create(['cita_cita' => $cita_cita]);
+		} else {
+			$res = CitaCita::updateOrCreate(['id' => $id], ['cita_cita' => $cita_cita]);
+		}
+		return $res;
+    }
+	
+	public function hapusCita($id){
+        $cita_cita = CitaCita::find($id);
+		$res = $cita_cita->delete();
+		return $res;
+    }
 
     public function jenis_tinggal(){
         return JenisTinggal::all();
     }
-
-    public function transportasi(){
+	
+	public function transportasi(){
         return Transportasi::all();
+    }
+	
+	public function simpanTransportasi(Request $request){
+        $id = $request->input('id');
+		$transportasi = $request->input('transportasi');
+		if($id==null){
+			$res = Transportasi::create(['transportasi' => $transportasi]);
+		} else {
+			$res = Transportasi::updateOrCreate(['id' => $id], ['transportasi' => $transportasi]);
+		}
+		return $res;
+    }
+	
+	public function hapusTransportasi($id){
+        $transportasi = Transportasi::find($id);
+		$res = $transportasi->delete();
+		return $res;
+    }
+
+    public function peminatan(){
+        return Peminatan::all();
+    }
+	
+	public function simpanPeminatan(Request $request){
+        $id = $request->input('id');
+		$peminatan = $request->input('peminatan');
+		if($id==null){
+			$res = peminatan::create(['peminatan' => $peminatan]);
+		} else {
+			$res = peminatan::updateOrCreate(['id' => $id], ['peminatan' => $peminatan]);
+		}
+		return $res;
+    }
+	
+	public function hapusPeminatan($id){
+        $peminatan = peminatan::find($id);
+		$res = $peminatan->delete();
+		return $res;
     }
 	
     public function hubungan(){
@@ -166,24 +262,147 @@ class funcController extends Controller
         return Kelas::all();
     }
 	
+	public function simpanKelas(Request $request){
+        $id = $request->input('id');
+		$kelas = $request->input('kelas');
+		if($id==null){
+			$res = kelas::create(['kelas' => $kelas]);
+		} else {
+			$res = kelas::updateOrCreate(['id' => $id], ['kelas' => $kelas]);
+		}
+		return $res;
+    }
+	
+	public function hapusKelas($id){
+        $kelas = kelas::find($id);
+		$res = $kelas->delete();
+		return $res;
+    }
+	
     public function jarak(){
         return Jarak::all();
+    }
+	
+	public function simpanJarak(Request $request){
+        $id = $request->input('id');
+		$jarak = $request->input('jarak');
+		if($id==null){
+			$res = jarak::create(['jarak' => $jarak]);
+		} else {
+			$res = jarak::updateOrCreate(['id' => $id], ['jarak' => $jarak]);
+		}
+		return $res;
+    }
+	
+	public function hapusJarak($id){
+        $jarak = jarak::find($id);
+		$res = $jarak->delete();
+		return $res;
+    }
+	
+	public function TahunAjaran(){
+        return TahunAjaran::all();
+    }
+	
+	public function simpanTahunAjaran(Request $request){
+        $id = $request->input('id');
+		$tahun_ajaran = $request->input('tahun_ajaran');
+		if($id==null){
+			$res = TahunAjaran::create(['tahun_ajaran' => $tahun_ajaran]);
+		} else {
+			$res = TahunAjaran::updateOrCreate(['id' => $id], ['tahun_ajaran' => $tahun_ajaran]);
+		}
+		return $res;
+    }
+	
+	public function hapusTahunAjaran($id){
+        $tahun_ajaran = TahunAjaran::find($id);
+		$res = $tahun_ajaran->delete();
+		return $res;
     }
 
     public function pekerjaan(){
         return Pekerjaan::all();
     }
+	
+	public function simpanPekerjaan(Request $request){
+        $id = $request->input('id');
+		$pekerjaan = $request->input('pekerjaan');
+		if($id==null){
+			$res = Pekerjaan::create(['pekerjaan' => $pekerjaan]);
+		} else {
+			$res = Pekerjaan::updateOrCreate(['id' => $id], ['pekerjaan' => $pekerjaan]);
+		}
+		return $res;
+    }
+	
+	public function hapusPekerjaan($id){
+        $pekerjaan = Pekerjaan::find($id);
+		$res = $pekerjaan->delete();
+		return $res;
+    }
 
     public function pendidikan(){
         return Pendidikan::all();
+    }
+	
+	public function simpanPendidikan(Request $request){
+        $id = $request->input('id');
+		$pendidikan = $request->input('pendidikan');
+		if($id==null){
+			$res = Pendidikan::create(['pendidikan' => $pendidikan]);
+		} else {
+			$res = Pendidikan::updateOrCreate(['id' => $id], ['pendidikan' => $pendidikan]);
+		}
+		return $res;
+    }
+	
+	public function hapusPendidikan($id){
+        $pendidikan = Pendidikan::find($id);
+		$res = $pendidikan->delete();
+		return $res;
     }
 
     public function penghasilan(){
         return Penghasilan::all();
     }
 	
+	public function simpanPenghasilan(Request $request){
+        $id = $request->input('id');
+		$penghasilan = $request->input('penghasilan');
+		if($id==null){
+			$res = penghasilan::create(['penghasilan' => $penghasilan]);
+		} else {
+			$res = penghasilan::updateOrCreate(['id' => $id], ['penghasilan' => $penghasilan]);
+		}
+		return $res;
+    }
+	
+	public function hapusPenghasilan($id){
+        $penghasilan = penghasilan::find($id);
+		$res = $penghasilan->delete();
+		return $res;
+    }
+	
 	public function mapel(){
         return Mapel::all();
+    }
+	
+	public function simpanMapel(Request $request){
+        $id = $request->input('id');
+		$mapel = $request->input('mapel');
+		if($id==null){
+			$res = mapel::create(['nama_mapel' => $mapel]);
+		} else {
+			$res = mapel::updateOrCreate(['id' => $id], ['nama_mapel' => $mapel]);
+		}
+		return $res;
+    }
+	
+	public function hapusMapel($id){
+        $mapel = mapel::find($id);
+		$res = $mapel->delete();
+		return $res;
     }
 
     public function propinsi(){

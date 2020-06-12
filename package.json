@@ -68,6 +68,7 @@
         "sweetalert": "^2.1.2",
         "sweetalert2": "^9.10.13",
         "v-tooltip": "^2.0.0-rc.33",
+        "vue-async-computed": "^3.8.2",
         "vue-form-generator": "^2.3.4",
         "vue-form-json-schema": "^2.5.3",
         "vue-form-wizard": "^0.8.4",

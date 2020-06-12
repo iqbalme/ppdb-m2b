@@ -60,10 +60,10 @@ export default {
 		RegisDataNilai,
 		RegisDataKonfirmasi
     },
-	//props: ['no_reg'],
+	props: ['no_reg'],
     data() {
         return {
-			no_reg: 'WODQYO15ILN2JXA0', //for testing only
+			//no_reg: 'WODQYO15ILN2JXA0', //for testing only
 			circle : 'circle',
 			//loading: false,
 			dataModel: {},
@@ -74,11 +74,11 @@ export default {
 		...mapState(['registrationStatus', 'loadingState', 'isEdit'])
 	},
 	watch: {
-		registrationStatus: function(){
-			if(this.registrationStatus!='running'){
-				this.$router.push({ name: 'invalidRegistration' })
-			}
-		}
+		// registrationStatus: function(){
+			// if(this.registrationStatus!='running'){
+				// this.$router.push({ name: 'invalidRegistration' })
+			// }
+		// }
 	},
 	created(){
 		if(this.no_reg != null){
@@ -104,7 +104,6 @@ export default {
 				this.$store.commit('SET_LOADING_STATE', false);
 				var res = response.data;
 				if(res.status =='error'){
-					console.log('gagal1 root');
 					this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
 				} else {
 					this.modalBox('Berhasil', 'Data telah tersimpan', 'success');
@@ -112,7 +111,6 @@ export default {
 				}
 			})
 			.catch(error => {
-				console.log('gagal2 root : ' + error);
 				this.$store.commit('SET_LOADING_STATE', false);
 				this.modalBox('Gagal', 'Registrasi gagal, silakan coba lagi!', 'warning');
 			});
@@ -125,15 +123,23 @@ export default {
 		  var refToValidate = this.$refs[name];
 		  return refToValidate.appendValueFromParent(val);
 		},
-		validateAll(){
-			if(this.validateStep('step1') &&
-				this.validateStep('step2') &&
-				this.validateStep('step3') &&
-				this.validateStep('step4') &&
-				this.validateStep('step5')){
-				if(!this.loadingState){
-					this.konfirmasiSimpan();
+		async validateAll(){
+			var error = 0;
+			var result = await Promise.all([
+				this.validateStep('step1'),
+				this.validateStep('step2'),
+				this.validateStep('step3'),
+				this.validateStep('step4'),
+				this.validateStep('step5')
+			]);
+			console.log(result);
+			for(var i=0;i<result.length;i++){
+				if(result[i]!=true){
+					error++;
 				}
+			}
+			if(error==0){
+				this.konfirmasiSimpan();
 			}
 		},
 		getDataPendaftar(){
@@ -142,7 +148,10 @@ export default {
 			.then((response)=> {
 				this.$store.commit('SET_LOADING_STATE', false);
 				var res = response.data;
-				console.log(res.data);
+				// var tt = {
+					// 'response' : res.data
+				// };
+				//console.log(tt);
 				if(res.status == 'success'){
 					this.dataForEdit = res.data;
 					this.editForm();
@@ -156,7 +165,7 @@ export default {
 				console.log('gagal4 : ' + error);
 				this.$store.commit('SET_LOADING_STATE', false);
 				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
-				//this.$router.push({name: 'Home'});
+				this.$router.push({name: 'Home'});
 			});
 		},
 		editForm(){
@@ -229,6 +238,7 @@ export default {
 					mapel  :  this.dataForEdit.nilai_akademik[i].mapel.nama_mapel,
 					keterangan  :  this.dataForEdit.nilai_akademik[i].keterangan,
 					nilai  :  {
+						id: this.dataForEdit.nilai_akademik[i].id,
 						semester1  :  this.dataForEdit.nilai_akademik[i].semester1,
 						semester2  :  this.dataForEdit.nilai_akademik[i].semester2,
 						semester3  :  this.dataForEdit.nilai_akademik[i].semester3,
@@ -239,6 +249,7 @@ export default {
 			};
 			for(var i=0;i<this.dataForEdit.prestasi_non_akademik.length;i++){
 				prestasi.push({
+					id: this.dataForEdit.prestasi_non_akademik[i].id,
 					jenis_lomba : this.dataForEdit.prestasi_non_akademik[i].jenis_lomba,
 					tempat_pelaksanaan : this.dataForEdit.prestasi_non_akademik[i].tempat_pelaksanaan,
 					tingkat : this.dataForEdit.prestasi_non_akademik[i].tingkat,
@@ -257,13 +268,8 @@ export default {
 			var lampiranpath = [];
 			var filelampiraninfo = []
 			for(var i=0;i<this.dataForEdit.lampiran.length;i++){
-				lampiranpath.push({
-					filename : this.dataForEdit.lampiran[i].nama_file,
-					url : this.dataForEdit.lampiran[i].path,
-					jenis_file : this.dataForEdit.lampiran[i].jenis_file,
-					keterangan : this.dataForEdit.lampiran[i].keterangan
-				});
 				filelampiraninfo.push({
+					url: this.dataForEdit.lampiran[i].path.replace('public', 'storage'),
 					nama_file : this.dataForEdit.lampiran[i].nama_file,
 					jenis_file : this.dataForEdit.lampiran[i].jenis_file,
 					keterangan : this.dataForEdit.lampiran[i].keterangan,
@@ -272,11 +278,15 @@ export default {
 			}
 			this.appendValueToChild('step5',
 				{
-					fileFoto: null,
+					fileFoto: {
+						file: null,
+						url: this.dataForEdit.foto_path.replace('public', 'storage')
+					},
 					fileLampiran: filelampiraninfo,
-					fileFotoPath: [this.dataForEdit.foto_path],
-					fileLampiranPath: lampiranpath,
-					email: this.dataForEdit.email
+					email: this.dataForEdit.email,
+					uploadList: [],
+					deleteList: [],
+					peminatan: this.dataForEdit.peminatan
 				}
 			);
 			this.$store.commit('SET_LOADING_STATE', false);

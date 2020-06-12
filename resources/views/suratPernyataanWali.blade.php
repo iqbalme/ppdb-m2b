@@ -15,10 +15,16 @@
 			@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Bitter:ital,wght@0,400;0,700;1,400&family=Martel+Sans:wght@300;700&family=Roboto:ital,wght@0,100;0,300;0,500;0,700;1,100;1,300&display=swap');
 			body { font-family: 'Martel Sans', Bitter, Roboto; }
 			table tr td {border-color:inherit;vertical-align:top}
+			.tg  {border-collapse:collapse;border-spacing:0;margin:0px auto;}
+			.tg td{background-color:#fff;border-color:black;border-style:solid;border-width:0px;color:#333;
+			  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:3px 5px;word-break:normal;}
+			.bold { font-weight: bold; }
+			.text-center { text-align: center; }
+			.vmiddle { vertical-align:middle; }
         </style>
     </head>
     <body>
-		<table style="width:100%;" >
+		<table style="width:100%;" class="tg">
 <thead>
   <tr>
     <th style="width:5%"></th>
@@ -34,8 +40,7 @@
 </thead>
 <tbody>
 	<tr>
-		<td colspan="4">Lampiran 2<br></td>
-		<td colspan="5">Barcode<br></td>
+		<td colspan="9">Lampiran 2<br></td>
 	</tr>
   <tr>
     <td colspan="9"><center><strong>SURAT PERNYATAAN ORANG TUA / WALI</strong></center><br></td>
@@ -176,6 +181,15 @@
     <td></td>
     <td colspan="4"><strong><u>({{ $nama_kepala }})</u><br>NIP. {{ $nip_kepala }}</strong></td>
     <td colspan="4"><strong>({{ $data_pendaftar['nama_wali'] }})</strong><br><font style="color:white">.</font></td>
+  </tr>
+  <tr>
+	<td colspan="8" style="height:7px"></td>
+  </tr>
+  <tr>
+	<td colspan="6"></td>
+	<td colspan="2" style="text-align:right">
+	{!!DNS2D::getBarcodeHTML(env('APP_URL').'/status/'.$status_pendaftar['noRegistrasi'], 'QRCODE',2,2)!!}
+	</td>
   </tr>
 </tbody>
 </table>

@@ -76,6 +76,7 @@ import CodeBlock from '@ckeditor/ckeditor5-code-block/src/codeblock';
 import $axios from '../../api.js';
 
 export default {
+	name: "editInfo",
     components: {
         Card,
     },
@@ -285,7 +286,11 @@ export default {
 			.then((response)=> {
 				var data = response.data;
 				if(data.status == 'success'){
-					this.editorData = data.data.informasi;
+					if(data.data.informasi == null){
+						this.editorData = '';
+					} else {
+						this.editorData = data.data.informasi;
+					}
 				}
 			});
 		},

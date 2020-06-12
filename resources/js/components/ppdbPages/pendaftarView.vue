@@ -4,19 +4,29 @@
         <div class="row">
             <div class="col-md">
                 <card>
+					<div class="row" v-show="loading">
+						<div class="col-md-12 text-center">
+							<b-spinner style="width: 5rem; height: 5rem;" label="Loading..."></b-spinner>
+						</div>
+					</div>
+					<div class="row" v-show="loading">
+						<div class="col-md-12 text-center">
+							<b-alert variant="info" show>Loading ...</b-alert>
+						</div>
+					</div>
+					<div v-show="!loading">
                     <div class="row">
 						<div class="col-md-12">
 							<div class="alert alert-primary text-center" style="font-size:1.5rem;font-weight:bold">
-								REGISTRASI BERHASIL
+								DATA REGISTRASI CALON PESERTA DIDIK
 							</div>
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-md-10 offset-md-1">
-							<p>SELAMAT <font style="font-weight:bold;color:blue;">{{ nama | upper }}</font>, ANDA BERHASIL TERDAFTAR DALAM SISTEM PENDAFTARAN ONLINE PENERIMAAN SISWA BARU MAN 2 BULUKUMBA.</p>
-							<p>Berikut info pendaftaran Anda:</p>
+							<p>BERIKUT INFO PENDAFTARAN ANDA:</p>
+							<b-alert show variant="dark" style="color:black;font-weight:bold;padding-left:25px;">NAMA LENGKAP : <font style="font-weight:bold;color:blue;">{{ nama | upper }}</font></b-alert>
 							<b-alert show variant="dark" style="color:black;font-weight:bold;padding-left:25px;">NO. REGISTRASI : {{ no_reg }}</b-alert>
-							<b-alert show variant="dark" style="color:black;font-weight:bold;padding-left:25px;">PIN : {{ pin }}</b-alert>
 							<p>Silakan cetak dan unduh dokumen di bawah ini.</p>
 						</div>
 					</div>
@@ -25,7 +35,12 @@
 								<b-button variant="danger" class="btn-block btn-fill" @click="makeDokumenPendaftar()">REFRESH</b-button>
 							</div>
 						</div>
-						<div  v-if="!loading">
+						<div  v-if="!loading && !failed && isAuth">
+						<div class="row">
+							<div class="col-md-2">
+								<base-input type="text" label="Masukkan PIN" v-model="pin" :validatedClass="$v.pin.$error"maxlength="5"></base-input>
+							</div>
+						</div>
 						<div class="row">
 							<div class="col-md-10 offset-md-1 text-center mb-3">
 								<b-button variant="danger" class="btn-block btn-fill" @click="forceFileDownload('kartu_reg')">CETAK KARTU REGISTRASI</b-button>
@@ -42,6 +57,7 @@
 							</div>
 						</div>
 						</div>
+						</div>
                 </card>
             </div>
         </div>
@@ -53,15 +69,19 @@
 import Card from "./../themeComponents/Cards/Card.vue";
 import $axios from '../../api.js';
 import Swal from 'sweetalert2';
+import { mapGetters } from 'vuex';
 
 export default {
     components: {
         Card,
     },
-	props: ['nama', 'no_reg', 'pin', 'email'],
+	props: ['no_reg'],
     data() {
         return {
-			informasi: ''
+			nama: null,
+			loading: true,
+			failed: false,
+			pin: null
 		}
     },
 	filters: {
@@ -77,34 +97,61 @@ export default {
 		}
 	},
 	created(){
-		
+		this.getInfoPendaftar()
+	},
+	computed:{
+		...mapGetters(['isAuth'])
 	},
     methods: {
-		cetakKartu(){
-			if(this.no_reg==null){
-				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
+		forceFileDownload(tipe){
+			var kartu_reg = 'Kartu_Registrasi_No_' + this.no_reg;
+			var surat_pernyataan_siswa = 'Surat_Pernyataan_Siswa_NoRegistrasi_' + this.no_reg;
+			var surat_pernyataan_wali = 'Surat_Pernyataan_Wali_NoRegistrasi_' + this.no_reg;
+			var file = '';
+			if(tipe == 'kartu_reg'){
+				file = kartu_reg;
+			} else if(tipe== 'surat_pernyataan_siswa'){
+				file = surat_pernyataan_siswa;
 			} else {
-				
+				file = surat_pernyataan_wali;
 			}
+			//const url = window.URL.createObjectURL(new Blob([response.data]))
+			const link = document.createElement('a')
+			link.href = process.env.MIX_APP_URL + '/storage/attachment/'+file+'.pdf' //mau diubah base urlnya
+			link.setAttribute('download', file+'.pdf') //or any other extension
+			document.body.appendChild(link)
+			link.click()
 		},
-		cetakSuratPernyataan(){
-			if(this.no_reg==null){
-				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
-			} else {
-				if(!this.email==null){ //jika tidak ada emailnya
-					
+		makeDokumenPendaftar(){
+			this.loading = true;
+			$axios.post('/afterregistrationsuccesspdf', {no_registrasi: this.no_reg})
+			.then((response)=> {
+				this.loading = false;
+				var res = response.data;
+				if(res.status == 'success'){
+					this.failed = false
 				} else {
-					
+					this.failed = true
 				}
-			}
+			})
+			.catch(error => {
+				this.loading = false;
+				this.failed = true;
+				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
+			});
 		},
-		getSuratPernyataanSiswa(no_reg) {
+		getInfoPendaftar() {
 		  $axios
-			.post('/afterregistrationsuccess', {no_registrasi: no_reg})
+			.post('/cekpendaftar', {no_registrasi: this.no_reg})
 			.then((response)=> {
 			  var res = response.data;
 				if(res.status=='success'){
-					this.modalBox('Berhasil', 'Update data berhasil!', 'success');
+					this.nama = res.data;
+					this.loading = false;
+					this.makeDokumenPendaftar();
+				} else {
+					this.modalBox('Gagal', 'Data tidak terdaftar!', 'warning');
+					this.$router.push({name: 'Registrasi'});
 				}
 			})
 			.catch(error => {

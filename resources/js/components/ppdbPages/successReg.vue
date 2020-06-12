@@ -51,7 +51,15 @@
 						<div class="col-md-10 offset-md-1">
 							<br>
 							<p>Selanjutnya silakan membawa dokumen ini serta dokumen pendukung lainnya ke sekolah untuk verifikasi data.</p>
-							<p>Catatan: jika kehilangan data ini, silakan cek di status pendaftaran dan mencari nama atau no registrasi, selanjutnya Anda bisa cetak dokumen dengan memasukkan PIN..</p>
+							<p style="font-weight:bold;text-decoration:underline">Catatan:</p>
+							<ul>
+								<li>
+									Jika kehilangan data ini, silakan cek di status pendaftaran dan mencari nama atau no registrasi, selanjutnya Anda bisa cetak dokumen dengan memasukkan PIN.
+								</li>
+								<li>
+									Jika data yang ingin dicetak berbeda dari data yang sudah diperbarui oleh Admin, maka silakan tunggu maksimal 15 menit kemudian cetak dari menu STATUS dengan memasukkan nomor registrasi Anda.
+								</li>
+							</ul>
 						</div>
 					</div>
                 </card>

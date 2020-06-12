@@ -15,7 +15,7 @@ class CreateTPenghasilan extends Migration
     {
         Schema::create('t_penghasilan', function (Blueprint $table) {
             $table->id();
-            $table->string('penghasilan');
+            $table->string('penghasilan')->unique();
         });
     }
 

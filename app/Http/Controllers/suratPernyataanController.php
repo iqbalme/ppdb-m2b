@@ -36,11 +36,4 @@ class suratPernyataanController extends Controller
         }
         return response()->json(compact('this'));
 	}
-	
-	public function suratPernyataanWali(Request $request){
-		return view('suratPernyataanWali');
-		die;
-		$pdf = PDF::loadView('suratPernyataanWali')->setPaper('A4', 'portrait')->setWarnings(false);
-        return $pdf->stream();
-	}
 }

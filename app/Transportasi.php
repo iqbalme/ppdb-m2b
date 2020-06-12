@@ -11,6 +11,6 @@ class Transportasi extends Model
     protected $fillable = ['transportasi'];
 
     public function pendaftar(){
-        return $this->belongsTo('App\Pendaftar')->withDefault();
+        return $this->hasManyThrough('App\Pendaftar', 'App\TahunAjaranPendaftar', 'tahun_ajaran_id', 'pendaftar_id');
     }
 }

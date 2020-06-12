@@ -33,7 +33,7 @@ class CreateTDataPendaftar extends Migration
             $table->foreign('jarak_rumah_madrasah_id')->on('t_jarak')->references('id')->delete('cascade');
             $table->bigInteger('transportasi_id')->unsigned();
             $table->foreign('transportasi_id')->on('t_transportasi')->references('id')->delete('cascade');
-            $table->string('no_kk');
+            $table->string('no_kk')->nullable();
             $table->string('nama_ayah');
             $table->string('nik_ayah')->nullable();
             $table->string('no_hp_ayah')->nullable();

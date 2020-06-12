@@ -15,7 +15,7 @@ class CreateTStatusPendaftar extends Migration
     {
         Schema::create('t_status_pendaftar', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pendaftar_id')->unsigned();
+            $table->bigInteger('pendaftar_id')->unsigned()->unique();
             $table->foreign('pendaftar_id')->on('t_pendaftar')->references('id')->delete('cascade');
 			$table->string('noRegistrasi')->unique();
 			$table->string('pin', 5);
