@@ -1,9 +1,8 @@
 <template>
   <div class="wrapper">
     <side-bar>
+		<MobileMenu></MobileMenu>
       <sidebar-link to="/index">
-        <!--b-icon icon="house" style="width: 30px; height: 30px;margin-right:13px"></b-icon>
-        <i class="nc-icon nc-chart-pie-35"></i> -->
 		<i class="pe-7s-home"></i>
         <p>Beranda</p>
       </sidebar-link>
@@ -58,9 +57,14 @@
   //import moment from 'moment'
   //import $axios from '../../api.js';
   import '@fortawesome/fontawesome-free/css/all.css'
+  import Vue from 'vue'
+  
+	Vue.component('MobileMenu', {
+	  template: `<div></div>`
+	});
   
   export default {
-    components: {
+	components: {
       TopNavbar,
       ContentFooter,
       DashboardContent,
@@ -68,6 +72,9 @@
     },
 	computed: {
 	...mapGetters(['isAuth'])
+	},
+	mounted(){
+		//this.$set(this.$options.components, TopNavbar, 'hidden');
 	},
     methods: {
       toggleSidebar () {
