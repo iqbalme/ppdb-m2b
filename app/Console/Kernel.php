@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('send:email')->everyFiveMinutes()->runInBackground();
 		$schedule->command('clear:attachments')->everyFifteenMinutes()->runInBackground();
-		$schedule->command('send:temporary')->twiceDaily(1, 13);()->runInBackground();
+		$schedule->command('send:temporary')->twiceDaily(1, 13)->runInBackground();
     }
 
     /**

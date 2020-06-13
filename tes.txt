@@ -1,1 +1,2 @@
-tes 12/06/2020 17:30
+perintah: 
+php /home/websites/laravel/artisan schedule:run >> /dev/null 2>&1
