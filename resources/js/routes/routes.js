@@ -1,4 +1,4 @@
-import DashboardLayout from './../components/layout/DashboardLayout.vue'
+import MainLayout from './../components/layout/MainLayout.vue'
 // GeneralViews
 import NotFound from './../components/pages/NotFoundPage.vue'
 
@@ -29,12 +29,12 @@ import pendaftarView from './../components/ppdbPages/pendaftarView.vue';
 const routes = [
   //{
   //  path: '/',
-  //  component: DashboardLayout,
+  //  component: MainLayout,
   //  redirect: '/dashboard'
   //},
   {
     path: '/',
-    component: DashboardLayout,
+    component: MainLayout,
     redirect: '/index',
     children: [
       {
@@ -113,7 +113,7 @@ const routes = [
   },
   {
     path: '/info',
-    component: DashboardLayout,
+    component: MainLayout,
     redirect: '/info/index',
 	children: [
 		{
@@ -132,7 +132,7 @@ const routes = [
   //{ path: '*', component: NotFound }
   { 
 	path: '*', 
-	component: DashboardLayout,
+	component: MainLayout,
     redirect: '/notfound',
 	children: [
 		{
