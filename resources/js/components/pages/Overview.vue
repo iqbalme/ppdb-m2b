@@ -125,7 +125,9 @@
         barChart: {
           data: {
             labels: ['Pendaftar', 'Terverifikasi', 'Lulus'],
-            series: []
+            series: [
+				[0,0,0]
+			]
           },
           options: {
             seriesBarDistance: 10,
@@ -147,34 +149,28 @@
         }
       }
     },
+	beforeCreate(){
+		//this.barChart.data.series = [[4,6,3]];
+	},
 	created(){
 		this.getPendaftar();
 		this.getValidated();
 		this.getLulus();
 		this.getVisitors();
-		this.nama_app = (process.env.MIX_APP_DISPLAY_NAME).toUpperCase();
-	},
-	mounted(){
-		this.barChart.data.series = [[0,0,0]];
+		this.nama_app = (process.env.MIX_APP_DISPLAY_NAME).toUpperCase();	
 	},
 	watch: {
-		j_pendaftar: function(){
-			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
+		pendaftar: function(val){
+			this.$set(this.barChart.data.series[0], 0, val);
 		},
-		j_lulus: function(){
-			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
+		lulus: function(val){
+			this.$set(this.barChart.data.series[0], 2, val);
 		},
-		j_validated: function(){
-			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
-		}
+		j_validated: function(val){
+			this.$set(this.barChart.data.series[0], 1, val);
+		},
 	},
 	computed: {
-		j_pendaftar: function(){
-			return this.pendaftar;
-		},
-		j_lulus: function(){
-			return this.lulus;
-		},
 		j_validated: function(){
 			return this.tervalidasi + this.lulus;
 		}
