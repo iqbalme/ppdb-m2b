@@ -31,7 +31,7 @@ class CreateTPendaftar extends Migration
             $table->integer('jumlah_saudara');
             $table->integer('anak_ke');
             $table->string('foto_path')->nullable();
-			$table->string('email')->unique()->nullable();
+			$table->string('email')->nullable();
             $table->timestamps();
         });
     }

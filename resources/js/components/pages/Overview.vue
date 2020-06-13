@@ -62,9 +62,22 @@
           </stats-card>
         </div>
       </div>
+	  
+	<div class="row">
+		<div class="col-md-4 offset-md-4 text-center mb-3">
+			<img src="http://ppdb.ccom/uploads/m2b.png" class="xlogo">
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-10 offset-md-1 text-center mb-3">
+			<div class="alert alert-secondary" role="alert" style="color:#000;">
+			  SELAMAT DATANG DI {{ nama_app }}
+			</div>
+		</div>
+	</div>
 
 	<div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           <chart-card
             :chart-data="barChart.data"
             :chart-options="barChart.options"
@@ -82,25 +95,6 @@
               <hr>
               <div class="stats">
                 <i class="fa fa-check"></i> Data valid
-              </div>
-            </template>
-          </chart-card>
-        </div>
-	  <div class="col-md-4">
-          <chart-card :chart-data="pieChart.data" chart-type="Pie">
-            <template slot="header">
-              <h4 class="card-title">Statistik</h4>
-              <p class="card-category">Top browser</p>
-            </template>
-            <template slot="footer">
-              <div class="legend">
-                <!--i class="fa fa-circle text-info"></i> Open
-                <i class="fa fa-circle text-danger"></i> Bounce
-                <i class="fa fa-circle text-warning"></i-->
-              </div>
-              <hr>
-              <div class="stats">
-                <i class="fa fa-clock-o"></i> 30 Hari terakhir
               </div>
             </template>
           </chart-card>
@@ -127,20 +121,11 @@
 		lulus: 0,
 		pageViews: 0,
 		visitors: 0,
-        editTooltip: 'Edit Task',
-        deleteTooltip: 'Remove',
-        pieChart: {
-          data: {
-            labels: [],
-            series: []
-          }
-        },
+		nama_app: '',
         barChart: {
           data: {
             labels: ['Pendaftar', 'Terverifikasi', 'Lulus'],
-            series: [
-              []
-            ]
+            series: []
           },
           options: {
             seriesBarDistance: 10,
@@ -163,38 +148,36 @@
       }
     },
 	created(){
-		this.clearAttachment();
 		this.getPendaftar();
 		this.getValidated();
 		this.getLulus();
 		this.getVisitors();
-		//this.getSetting();
-		//this.getPageViews();
-		//this.getBrowser();
-		// this.barChart.data.series[0].push(15);
-		// this.barChart.data.series[0].push(45);
-		// this.barChart.data.series[0].push(32);		
+		this.nama_app = (process.env.MIX_APP_DISPLAY_NAME).toUpperCase();
 	},
 	mounted(){
-		this.barChart.data.series[0].push(this.pendaftar);
-		this.barChart.data.series[0].push(this.j_validated);
-		this.barChart.data.series[0].push(this.lulus);
+		this.barChart.data.series = [[0,0,0]];
+	},
+	watch: {
+		j_pendaftar: function(){
+			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
+		},
+		j_lulus: function(){
+			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
+		},
+		j_validated: function(){
+			this.barChart.data.series = [[this.j_pendaftar, this.j_validated, this.j_lulus]];
+		}
 	},
 	computed: {
+		j_pendaftar: function(){
+			return this.pendaftar;
+		},
+		j_lulus: function(){
+			return this.lulus;
+		},
 		j_validated: function(){
 			return this.tervalidasi + this.lulus;
 		}
-	},
-	watch: {
-		pendaftar: function(){
-			this.barChart.data.series[0][0] = this.pendaftar;
-		},
-		j_validated: function(){
-			this.barChart.data.series[0][1] = this.j_validated;
-		},
-		lulus: function(){
-			this.barChart.data.series[0][2] = this.lulus;
-		},
 	},
 	methods: {
 		getPageViews() {
@@ -251,21 +234,6 @@
 			  this.lulus = items.lulus;
 			});
 		},
-		getBrowser() {
-		  axios
-			.get('/api/browser-ga')
-			.then((response)=> {
-			  var res = response.data;
-			  if(res.status == 'success'){
-				for(var i=0;i<res.data.length;i++){
-					this.pieChart.data.series.push(res.data[i].sessions);
-				}
-				for(var i2=0;i2<res.data.length;i2++){
-					this.pieChart.data.labels.push(res.data[i2].browser);
-				}
-			  }
-			});
-		},
 		getVisitors() {
 		  axios
 			.get('/api/visitors')
@@ -275,10 +243,7 @@
 				this.visitors = res.data;
 			  }
 			});
-		},
-		clearAttachment() {
-		  axios.get('/api/clearAttachment');
-		},
+		}
 	}
   }
 </script>

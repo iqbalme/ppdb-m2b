@@ -139,7 +139,7 @@
   </tr>
   <tr>
     <td colspan="5"></td>
-    <td colspan="4">{{ $lokasi_surat }}, {{ $tanggal_surat }}</td>
+    <td colspan="4">{{ env('TEMPAT_PERSURATAN') }}, {{ date("d-m-Y") }}</td>
   </tr>
   <tr>
     <td colspan="9">
@@ -179,7 +179,7 @@
   </tr>
   <tr>
     <td></td>
-    <td colspan="4"><strong><u>({{ $nama_kepala }})</u><br>NIP. {{ $nip_kepala }}</strong></td>
+    <td colspan="4"><strong><u>({{ env('NAMA_KEPALA_SEKOLAH') }})</u><br>NIP. {{ env('NIP_KEPALA_SEKOLAH') }}</strong></td>
     <td colspan="4"><strong>({{ $data_pendaftar['nama_wali'] }})</strong><br><font style="color:white">.</font></td>
   </tr>
   <tr>

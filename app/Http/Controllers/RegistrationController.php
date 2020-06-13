@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Pendaftar;
-use App\DataPendaftar;
-use App\NilaiAkademik;
 use App\Prestasi;
 use App\Lampiran;
 use App\TahunAjaran;
+use App\EmailToSend;
+use App\EmailSent;
 use App\Wilayah;
 use App\StatusPendaftar;
 use App\Mail\registrasiEmail;
@@ -157,9 +157,6 @@ class RegistrationController extends Controller
 				'agama_wali_id' => $agama_wali
 			];
 			$pendaftar->data_pendaftar()->updateOrCreate(['pendaftar_id' => $pendaftar->id], $detail_data_pendaftar);
-			// if($data_pendaftar->isDirty()){
-				// $pendaftar->data_pendaftar()->fill($detail_data_pendaftar)->save();
-			// }
 			for($i=0;$i<count($nilai_akademik_data);$i++){
 				$data_akademik = [
 					'semester1' => $nilai_akademik_data[$i]['nilai']['semester1'],
@@ -169,18 +166,7 @@ class RegistrationController extends Controller
 					'semester5' => $nilai_akademik_data[$i]['nilai']['semester5'],
 					'keterangan' => $nilai_akademik_data[$i]['keterangan'] ?: ''
 				];
-				
 				$pendaftar->nilai_akademik()->updateOrCreate(['mapel_id' => $nilai_akademik_data[$i]['id']], $data_akademik);
-				
-				// if($request->input('id') == null){
-					// NilaiAkademik::create($data_akademik);
-				// } else {
-					// $nilai_akademik = NilaiAkademik::find($nilai_akademik_data[$i]['nilai']['id']);
-					// $nilai_akademik->fill($data_akademik);
-					// if($nilai_akademik->isDirty()){
-						// $nilai_akademik->save();
-					// }
-				// }
 			}
 			for($i=0;$i<count($prestasi_non_akademik_data);$i++){
 				$data_prestasi = [
@@ -190,18 +176,8 @@ class RegistrationController extends Controller
 					'tempat_pelaksanaan' => $prestasi_non_akademik_data[$i]['tempat_pelaksanaan'],
 					'peringkat_juara' => $prestasi_non_akademik_data[$i]['peringkat_juara']
 				];
-				$id_prestasi = $prestasi_non_akademik_data[$i]['id'];
-				if($id_prestasi == null){
-					$pendaftar->prestasi_non_akademik()->create($data_prestasi);
-				} else {
-					$prestasi_temp = Prestasi::find($id_prestasi);
-					$prestasi_temp->fill($data_prestasi);
-					if($prestasi_temp->isDirty()){
-						$prestasi_temp->save();
-					}
-				}
+				$pendaftar->prestasi_non_akademik()->updateOrCreate(['id' => $prestasi_non_akademik_data[$i]['id']]);
 			}
-			
 			// cek file foto, sama atau tidak, jika tidak maka update dan hapus filenya
 			// cek file lampiran, jika bertambah atau berkurang
 			// semua file temporary dipindahkan jika sukses registrasi
@@ -223,34 +199,22 @@ class RegistrationController extends Controller
 			for($i=0;$i<count($peminatan);$i++){
 				$pendaftar->peminatan_siswa()->updateOrCreate(['peminatan_id' => $peminatan[$i]['id']]);
 			}
-			if($request->input('id') == null){
-				$status_pendaftar = new StatusPendaftar;
-				$no_reg = strtoupper(Str::random(16));
-				$status_pendaftar->noRegistrasi = $no_reg;
-				$digits_pin = 5;
-				$pin = rand(pow(10, $digits_pin-1), pow(10, $digits_pin)-1);
-				$status_pendaftar->pin = $pin;
-				$pendaftar->status_pendaftar()->save($status_pendaftar);
-				$result = [
-					'pendaftar' => $pendaftar->nama_lengkap,
-					'no_reg' => $no_reg,
-					'pin' => $pin,
-					'email' => $pendaftar->email
-				];
-			} else {
-				$status_pendaftar = StatusPendaftar::where('pendaftar_id', $request->input('id'))->first();
-				$result = [
-					'pendaftar' => $pendaftar->nama_lengkap,
-					'no_reg' => $status_pendaftar->noRegistrasi,
-					'pin' => $status_pendaftar->pin,
-					'email' => $pendaftar->email
-				];
-			}
+			$digits_pin = 5; //inisiasi jumlah digit pin
+			$no_reg = strtoupper(Str::random(16)); //inisiasi no registrasi acak
+			$pin = rand(pow(10, $digits_pin-1), pow(10, $digits_pin)-1); //inisiasi pin acak
+			$status_pendaftar_data = [
+				'noRegistrasi' => $no_reg,
+				'pin' => $pin
+			];
+			$result = [
+				'pendaftar' => $pendaftar->nama_lengkap,
+				'no_reg' => $no_reg,
+				'pin' => $pin,
+				'email' => $pendaftar->email
+			];
+			$pendaftar->status_pendaftar()->updateOrCreate($status_pendaftar_data);
 			$response = response()->json(["status" => "success", "data" => $result]);
 			DB::commit();
-			// $pdftr = Pendaftar::find($request->input('id'));
-			// $pdftr->foto_path = str_replace('storage/temporary/foto', 'public/foto', $fileFoto);
-			// $pdftr->save();
 			$filefoto_curr = str_replace('storage', 'public', $fileFoto);
 			if(strpos($filefoto_curr,'public/temporary') !== false){ //jika sudah ada sebelumnya berarti tidak dieksekusi
 				if(Storage::exists($filefoto_curr)){
@@ -302,26 +266,6 @@ class RegistrationController extends Controller
 		}
 	}
 	
-	public function tesquery2(Request $request){
-		$prestasi = $request->prestasi;
-		try{
-			$pendaftar = Pendaftar::find(13);
-			//$prestasi_db = Prestasi::where('pendaftar_id', 13);
-			$prestasi_data = Prestasi::find(14);
-			//return $prestasi_db->get();
-			dd($prestasi_data);
-			$prestasi_data->fill($prestasi);
-			if($prestasi_data->first()->isDirty()){
-				return 'berubah';
-			} else {
-				return 'tidak berubah';
-			}
-			die;
-		} catch(Exception $e){
-			return response()->json(["status" => "error", "message" => $e]);
-		}
-	}
-	
 	public function cekPendaftar(Request $request){
 		$no_reg = $request->no_registrasi;
 		try {
@@ -342,30 +286,14 @@ class RegistrationController extends Controller
 		if($response['status'] = 'success'){
 			$data = $response['data'];
 			try{
-				// $data_surat = [
-					// 'lokasi_surat' => env('TEMPAT_PERSURATAN'),
-					// 'tanggal_surat' => date("d-m-Y"),
-					// 'nama_kepala' => env('NAMA_KEPALA_SEKOLAH'),
-					// 'nip_kepala' => env('NIP_KEPALA_SEKOLAH')
-				// ];
-				// $new_data = array_merge_recursive($data->toArray(), $data_surat);
 				$surat_pernyataan_siswa = $this->suratPernyataanSiswa($data);
 				$surat_pernyataan_wali = $this->suratPernyataanWali($data);
 				$kartu_registrasi = $this->kartuRegistrasi($data);
 				if(($surat_pernyataan_siswa == 'success') && ($surat_pernyataan_wali == 'success') && ($kartu_registrasi == 'success')){
-					$attachments = [
-						$this->prefix_path.'Kartu_Registrasi_No_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf',
-						$this->prefix_path.'Surat_Pernyataan_Siswa_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf',
-						$this->prefix_path.'Surat_Pernyataan_Wali_NoRegistrasi_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf'
-					];
-					if($data['email']!=null){
-						$sending_email = $this->kirimAttachment($new_data, $attachments);
-						if($sending_email == 'success'){
-							return response()->json(['status' => 'success']);
-						} else {
-							return response()->json(['status' => 'error']);
-						}
-					} else {
+					if($data['email']!=null){ // fungsi kirim email
+						$this->scheduleEmailSending($data);
+						return response()->json(['status' => 'success']);						
+					} else { // jika tidak ada email
 						return response()->json(['status' => 'success']);
 					}					
 				} else {
@@ -376,6 +304,22 @@ class RegistrationController extends Controller
 			}
 		} else {
 			return response()->json(['status' => 'error']);
+		}
+	}
+	
+	public function scheduleEmailSending($data){
+		try{
+			$is_sent = EmailSent::where(['pendaftar_id' => $data['id'],
+				'email' => $data['email']]);
+			if($is_sent->count() == 0){
+				$to_send = EmailToSend::updateOrCreate([
+					'pendaftar_id' => $data['id'],
+					'email' => $data['email'],
+					'data' => json_encode($data)
+				]);
+			}
+		} catch(Exception $e){
+			$this->scheduleEmailSending($data);
 		}
 	}
 	
@@ -403,20 +347,6 @@ class RegistrationController extends Controller
 			$response = ['status' => 'error', 'message' => $e];
 		}
 		return $response;
-	}
-	
-	//kirim attachment
-	public function kirimAttachment($data, $attachments){
-		$object_to_send = [
-			'data' => $data,
-			'attachments' => $attachments
-		];
-		try{
-			Mail::to($object_to_send['data']['email'])->send(new registrasiEmail($object_to_send));
-			return 'success';
-		} catch(Exception $e){
-			return 'error';
-		}
 	}
 
 	//public function kartuRegistrasi(){ // for testing only

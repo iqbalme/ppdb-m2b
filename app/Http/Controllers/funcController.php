@@ -23,6 +23,7 @@ use App\Lampiran;
 use App\Wilayah;
 use App\Mapel;
 use App\Info;
+use App\User;
 use App\JadwalPpdb;
 use App\Pendaftar;
 use App\Visitors;
@@ -113,22 +114,6 @@ class funcController extends Controller
 			return response()->json(["status" => "success"]);
 		} else {
 			return response()->json(["status" => "error"]);
-		}
-	}
-	
-	public function hapusFileBerkala(Request $request){ // toleransi waktu hapus 15 jam
-		try{
-			$prefix_path = 'public/temporary/';
-			$list = Storage::allFiles($prefix_path);
-			foreach($list as $file){
-				$last_modified = Storage::lastModified($file);
-				if((time()-$last_modified)>10800){ //1 menit = 60 // 15 jam kemudian
-					Storage::delete($file);
-				}
-			}
-			return response()->json(['status' => 'success']);
-		} catch(Exception $e){
-			return response()->json(['status' => 'error']);
 		}
 	}
 	
@@ -233,6 +218,14 @@ class funcController extends Controller
 		} else {
 			$res = Transportasi::updateOrCreate(['id' => $id], ['transportasi' => $transportasi]);
 		}
+		return $res;
+    }
+	
+	public function simpanProfil(Request $request){
+        $username = 'admin';
+		$name = 'admin';
+		$password = $request->input('password');
+		$res = User::updateOrCreate(['username' => $username, 'name' => $name], ['password' => bcrypt($password)]);
 		return $res;
     }
 	
@@ -618,23 +611,6 @@ class funcController extends Controller
 		}	
 	}
 	
-	public function clearAttachment(){
-		try{
-			$prefix_path = 'public/attachment/';
-			$list = Storage::allFiles($prefix_path);
-			for($i=0;$i<count($list);$i++){
-				$last_modified = Storage::lastModified($list[$i]);
-				if((time()-$last_modified)>900){ //1 menit = 60
-					//$waktu[] = 'time:'.time().',modified:'.$last_modified.',selisih:'.(time()-$last_modified);
-					Storage::delete($list[$i]);
-				}
-			}
-			return response()->json(['status' => 'success']);
-		} catch(Exception $e){
-			return response()->json(['status' => 'error']);
-		}
-	}
-	
 	public function isPinValid(Request $request){
 		try{
 			$pin = StatusPendaftar::where(['noRegistrasi' => $request->input('no_reg'), 'pin' => $request->input('pin')]);
@@ -645,6 +621,29 @@ class funcController extends Controller
 			}
 		} catch(Exception $e){
 			return response()->json(['status' => 'error']);
+		}
+	}
+	
+	public function bersihkanData(){
+		try{
+			DB::table('t_status_pendaftar')->delete();
+			DB::table('t_prestasi_non_akademik')->delete();
+			DB::table('t_nilai_akademik')->delete();
+			DB::table('t_pendaftar_kelas')->delete();
+			DB::table('t_peminatan_siswa')->delete();
+			DB::table('t_email_sent')->delete();
+			DB::table('t_email_to_send')->delete();
+			DB::table('t_lampiran')->delete();
+			DB::table('t_tahun_ajaran_pendaftar')->delete();
+			DB::table('t_data_pendaftar')->delete();
+			DB::table('t_pendaftar')->delete();
+			$files =   Storage::allFiles('/public/');
+
+			// Delete Files
+			Storage::delete($files);
+			return 'success';
+		} catch(Exception $e){
+			return 'error';
 		}
 	}
 

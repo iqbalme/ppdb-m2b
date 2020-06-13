@@ -94,10 +94,13 @@ export default {
     methods: {
         validate() {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
-			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
-			var isValid = !this.$v.sekolah.$invalid
-			this.$emit('on-validate', this.sekolah, true)
-			return true
+			if(this.$v.$error) {
+				this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
+				return false
+			} else {
+				this.$emit('on-validate', this.sekolah, true)
+				return true
+			}
 		},
 		appendValueFromParent(val){
 			this.sekolah = val;

@@ -314,7 +314,6 @@ export default {
 		comp_pekerjaan_ayah(){
 			if(this.options.list_pekerjaan.length>0){
 				var index = this.getIndexPekerjaan('Almarhum');
-				console.log('index ayah ' + this.getIndexHubungan('Ayah'));
 				if(this.wali.pekerjaan_ayah == this.options.list_pekerjaan[index].value){
 					this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = true
 					this.wali.nik_ayah = ''
@@ -324,7 +323,9 @@ export default {
 					this.resetWaliElement()
 				} else {
 					this.ayah_is_almarhum = false;
-					this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = false
+					if(this.getIndexHubungan('Ayah')!== undefined){
+						this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = false
+					}
 					if(this.wali_is_ayah){
 						this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah
 					}
@@ -368,7 +369,9 @@ export default {
 					this.resetWaliElement()
 				} else {
 					this.ibu_is_almarhum = false
-					this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = false;
+					if(this.getIndexHubungan('Ibu')!== undefined){
+						this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = false;
+					}					
 					if(this.wali_is_ibu){
 						this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu
 					}
@@ -466,10 +469,13 @@ export default {
     methods: {
 		validate() {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
-			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
-			var isValid = !this.$v.wali.$invalid
-			this.$emit('on-validate', this.wali, true)
-			return true
+			if(this.$v.$error) {
+				this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
+				return false
+			} else {
+				this.$emit('on-validate', this.wali, true)
+				return true
+			}
 		},
 		appendValueFromParent(val){
 			//if(!this.loadingState){
@@ -489,9 +495,6 @@ export default {
 						text: items[i].agama
 					});
 				  }
-				})
-				.catch(error => {
-				  console.log(error);
 				});
 			}
 		},
@@ -508,9 +511,6 @@ export default {
 						text: items[i].pekerjaan
 					});
 				  }
-				})
-				.catch(error => {
-				  console.log(error);
 				});
 			}
 		},
@@ -527,9 +527,6 @@ export default {
 						text: items[i].pendidikan
 					});
 				  }
-				})
-				.catch(error => {
-				  console.log(error);
 				});
 			}
 		},
@@ -546,9 +543,6 @@ export default {
 						text: items[i].penghasilan
 					});
 				  }
-				})
-				.catch(error => {
-				  console.log(error);
 				});
 			}
 		},
@@ -566,9 +560,6 @@ export default {
 						disabled: false
 					});
 				  }
-				})
-				.catch(error => {
-				  console.log(error);
 				});
 			}
 		},

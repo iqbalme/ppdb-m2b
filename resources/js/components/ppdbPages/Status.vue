@@ -26,7 +26,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-8 offset-md-2">
-					<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+					<div class="alert alert-warning" style="font-size:1rem;color:#000;">
 						Keterangan:<br>
 						<ul>
 							<li>
@@ -95,7 +95,7 @@
 						</div>
 						<div class="row" v-if="!loading">
 							<div class="col-md-12">
-								<base-input type="password" label="Masukkan PIN" v-model="pin" :validatedClass="$v.pin.$error"></base-input>
+								<base-input type="password" label="Masukkan PIN" v-model="pin" :validatedClass="$v.pin.$error" maxLength="5"></base-input>
 							</div>
 						</div>
 						</card>

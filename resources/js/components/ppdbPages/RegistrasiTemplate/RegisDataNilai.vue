@@ -442,9 +442,6 @@ export default {
 					// this.options = Object.assign({}, this.options, obj6);
 					// this.$set({}, this.options, obj6);
 				  }
-				})
-				.catch(error => {
-				  //console.log(error);
 				});
 			}
 		},

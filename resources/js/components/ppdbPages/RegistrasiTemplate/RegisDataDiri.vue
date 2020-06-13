@@ -289,10 +289,13 @@ export default {
     methods: {
         validate() {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
-			if(this.$v.$error) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
-			var isValid = !this.$v.siswa.$invalid
-			this.$emit('on-validate', this.siswa, true)
-			return true
+			if(this.$v.$error) {
+				this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
+				return false;
+			} else {
+				this.$emit('on-validate', this.siswa, true)
+				return true
+			}			
 		},
 		appendValueFromParent(val){
 			this.siswa = val;
@@ -313,10 +316,6 @@ export default {
 						text: items[i].transportasi
 					});
 				  }
-				})
-				.catch(error => {
-				  //console.log(error);
-				  this.getTransportasi();
 				});
 			}
 		},
@@ -335,10 +334,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					this.getJarak();
-				  //console.log(error);
 				});
 			}
 		},
@@ -357,10 +352,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					this.getHobi();
-				  //console.log(error);
 				});
 			}
 		},
@@ -379,10 +370,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					this.getCita();
-				  //console.log(error);
 				});
 			}
 		},
@@ -401,10 +388,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					this.getAgama();
-				  //console.log(error);
 				});
 			}
 		},
@@ -423,12 +406,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					if(this.options.list_propinsi.length>0){
-						this.getPropinsi();
-					}
-				  //console.log(error);
 				});
 			}
 		},
@@ -446,12 +423,6 @@ export default {
 				});
 			  }
 			  
-			})
-			.catch(error => {
-				if(this.options.list_kabupaten.length>0){
-					this.getKabupaten();
-				}
-			  //console.log(error);
 			});
 		},
 		getKecamatan(id) {
@@ -468,12 +439,6 @@ export default {
 				});
 			  }
 			  
-			})
-			.catch(error => {
-				if(this.options.list_kecamatan.length>0){
-					this.getKecamatan();
-				}				
-			  //console.log(error);
 			});
 		},
 		getKelurahan(id) {
@@ -490,12 +455,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					if(this.options.list_kelurahan.length>0){
-						this.getKelurahan();
-					}
-				  //console.log(error);
 				});
 			}
 		},
@@ -514,12 +473,6 @@ export default {
 					});
 				  }
 				  
-				})
-				.catch(error => {
-					if(this.options.list_jenis_tinggal.length>0){
-						this.getJenisTinggal();
-					}
-				  //console.log(error);
 				});
 			}
 		},

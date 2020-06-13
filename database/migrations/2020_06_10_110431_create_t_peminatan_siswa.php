@@ -17,7 +17,7 @@ class CreateTPeminatanSiswa extends Migration
             $table->id();
             $table->bigInteger('pendaftar_id')->unsigned();
 			$table->foreign('pendaftar_id')->on('t_pendaftar')->references('id')->delete('cascade');
-			$table->bigInteger('peminatan_id')->unsigned()->unique();
+			$table->bigInteger('peminatan_id')->unsigned();
 			$table->foreign('peminatan_id')->on('t_peminatan')->references('id')->delete('cascade');
         });
     }

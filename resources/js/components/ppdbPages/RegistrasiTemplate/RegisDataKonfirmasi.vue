@@ -429,11 +429,13 @@ export default {
 			};			
 		},
 		LampiranSelectedMethod(e){
-			var lampiranFile = e.target.files[0];
-			if(lampiranFile.size>409600){
-				this.warningFileSize();
-				this.clearLampiranForm();
-			};			
+			if(this.lampiran.file_lampiran != null){
+				var lampiranFile = e.target.files[0];
+				if(lampiranFile.size>409600){
+					this.warningFileSize();
+					this.clearLampiranForm();
+				};
+			}
 		},
 		insertLampiranToTable(){
 			if(this.lampiran.file_lampiran != null){
@@ -486,9 +488,6 @@ export default {
 							});
 					  }					
 				  }				  
-				})
-				.catch(error => {
-					this.getPeminatan();
 				});
 			}
 		},

@@ -17,11 +17,11 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
     // return $request->user();
 // });
+Route::post('/bersihkanData', 'funcController@bersihkanData'); //bersihkan semua data pendaftar
 Route::post('/images', 'funcController@uploadImage'); //upload foto di info
 Route::post('/uploadLampiran', 'funcController@uploadLampiran'); //upload lampiran atau foto
 Route::post('/uploadFoto', 'funcController@uploadFoto'); //upload foto
 Route::post('/hapusfile', 'funcController@hapusFile'); //hapus dokumen
-Route::get('/hapusfileberkala', 'funcController@hapusFileBerkala'); //hapus temporary files berkala setiap 2 jam
 Route::post('/updateLampiranUser', 'funcController@updateLampiranUser'); //update lampiran db user
 Route::post('/hapusLampiranUser', 'funcController@hapusLampiranUser'); //hapus lampiran db user
 Route::post('/cekpin', 'funcController@cekPin'); // cek pin untuk print
@@ -46,6 +46,7 @@ Route::post('/kelas', 'funcController@simpanKelas'); // simpan kelas
 Route::get('/tahun_ajaran', 'funcController@TahunAjaran'); //get tahun_ajaran
 Route::delete('/tahun_ajaran/{id}', 'funcController@hapusTahunAjaran'); // hapus tahun_ajaran
 Route::post('/tahun_ajaran', 'funcController@simpanTahunAjaran'); // simpan tahun_ajaran
+Route::post('/profil', 'funcController@simpanProfil'); // simpan profil
 Route::post('/kelasPendaftar', 'funcController@setKelasPendaftar');
 Route::post('/deletekelasPendaftar', 'funcController@deleteKelasPendaftar');
 Route::post('/cekKelasPendaftar', 'funcController@cekKelasPendaftar');
@@ -80,11 +81,7 @@ Route::post('/informasi', 'funcController@edit_informasi');
 Route::get('/informasi', 'funcController@info');
 Route::post('/registrasi', 'RegistrationController@submitRegistration'); //registrasi
 Route::get('/tesquery', 'RegistrationController@tesquery'); //tes query
-Route::get('/tesquery2', 'RegistrationController@tesquery2'); //tes query
-Route::post('/kirimAttachment', 'RegistrationController@kirimAttachment'); //kirim attachment
 Route::post('/cekpendaftar', 'RegistrationController@cekPendaftar'); // cek pendaftar dgn noreg
-Route::get('/suratpernyataansiswapdf', 'RegistrationController@suratPernyataanSiswa'); // testing only surat pernyataan siswa
-Route::get('/suratpernyataanwalipdf', 'RegistrationController@suratPernyataanWali'); // testing only surat pernyataan wali
 Route::post('/afterregistrationsuccesspdf', 'RegistrationController@afterRegistrationSuksesPdf'); //after sukses registration return pdf
 Route::post('/afterregistrationsuccess', 'RegistrationController@afterRegistrationSukses'); //after sukses registration return data
 Route::get('/karturegistrasi', 'RegistrationController@kartuRegistrasi');
@@ -97,8 +94,6 @@ Route::get('/analytics-pv', 'funcController@getAnalytics');
 Route::get('/analytics', 'funcController@analytic');
 Route::get('/browser-ga', 'funcController@getBrowserAnalytics');
 Route::get('/visitors', 'funcController@getVisitors');
-Route::get('/clearAttachment', 'funcController@clearAttachment');
-Route::get('/suratpernyataansiswa', 'suratPernyataanController@suratPernyataanSiswa'); //testing
 Route::get('/teskelas', 'TestController@pendaftar'); //testing
 Route::get('/teskirimpesan', function(){
 	$data = [

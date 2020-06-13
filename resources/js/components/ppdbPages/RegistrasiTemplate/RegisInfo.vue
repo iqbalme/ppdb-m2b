@@ -60,10 +60,12 @@ export default {
     methods: {
         validate() {
 			this.$v.$touch(); //VALIDASI DIJALANKAN
-			if(this.$v.persetujuan.$invalid) this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
-			var isValid = !this.$v.persetujuan.$invalid
-			//this.$emit('on-validate', this.$data, isValid)
-			return isValid
+			if(this.$v.persetujuan.$invalid) {
+				this.$emit('invalidValidation') //APABILA ERROR MAKA STOP
+				return false
+			} else {
+				return true
+			}
 		}
     }
 };

@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        'App\Console\Commands\cronEmail',
+		'App\Console\Commands\clearAttachment',
+		'App\Console\Commands\clearTemporary'
     ];
 
     /**
@@ -24,7 +26,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('send:email')->everyFiveMinutes()->runInBackground();
+		$schedule->command('clear:attachments')->everyFifteenMinutes()->runInBackground();
+		$schedule->command('send:temporary')->twiceDaily(1, 13);()->runInBackground();
     }
 
     /**

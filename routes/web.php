@@ -23,7 +23,8 @@ use Illuminate\Support\Facades\Route;
 
 // Route::get('/home', 'HomeController@index')->name('home');
 // Route::get('/vuetest', 'VuetestController@index');
-Route::get('/{any}', 'VueController@index')->where('any', '.*');
+Route::get('/{any}', 'VueController@index')->where('any', '.*'); // ini diaktifkan
+//Route::get('/', function(){ return 'PPDB MAN 2 BULUKUMBA'; });
 // Route::post('/images', 'funcController@uploadImage');
 //Route::get('/apps/{vue_capture?}', function () {
 //    return view('index');

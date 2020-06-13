@@ -30,16 +30,16 @@ class registrasiEmail extends Mailable
     public function build()
     {
 		$temp_data = $this->data;
-		$subjek = env('PREFIX_SUBJECT_REGISTRATION_EMAIL_ATTACHMENT', '').$temp_data["data"]["status_pendaftar"]["noRegistrasi"];
+		$subjek = env('PREFIX_SUBJECT_REGISTRATION_EMAIL_ATTACHMENT', '').$temp_data['data']->status_pendaftar->noRegistrasi;
 		$message = $this->view('mail.registrasiEmail')
 			->subject($subjek)
 			->with([
-				"nama" => $temp_data["data"]['nama_lengkap'],
-				"no_registrasi" => $temp_data["data"]["status_pendaftar"]["noRegistrasi"],
-				"pin" => $temp_data["data"]["status_pendaftar"]["pin"],
+				"nama" => $temp_data['data']->nama_lengkap,
+				"no_registrasi" => $temp_data['data']->status_pendaftar->noRegistrasi,
+				"pin" => $temp_data['data']->status_pendaftar->pin,
 			]);
-		for($i=0;$i<count($temp_data["attachments"]);$i++){
-			$message->attach(storage_path('app/'.$temp_data["attachments"][$i]));
+		for($i=0;$i<count($temp_data['attachments']);$i++){
+			$message->attach(storage_path('app/'.$temp_data['attachments'][$i]));
 		}
 		return $message;
     }

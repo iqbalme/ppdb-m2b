@@ -54,7 +54,7 @@
 			<td colspan="2">
 				<img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Kementerian_Agama_new_logo.png" width="90px">
 			</td>
-			<td colspan="14" class="text-center" style="margin-bottom:1px;line-height:130%;">
+			<td colspan="14" class="text-center" style="margin-bottom:1px;line-height:130%;font-size:13px;">
 			<b>KEMENTERIAN AGAMA REPUBLIK INDONESIA<br>
 			KANTOR KEMENTERIAN AGAMA KABUPATEN BULUKUMBA<br>
 			MADRASAH ALIYAH NEGERI 2 BULUKUMBA</b><br>
@@ -871,7 +871,7 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td colspan="7">{{ $lokasi_surat }}, {{ $tanggal_surat }}</td>
+			<td colspan="7"><u>({{ env('NAMA_KEPALA_SEKOLAH') }})</u><br>NIP. {{ env('NIP_KEPALA_SEKOLAH') }}</td>
 			<td></td>
 		  </tr>
 		  <tr>

@@ -184,7 +184,7 @@
 		  </tr>
 		  <tr>
 			<td colspan="4"></td>
-			<td colspan="5">{{ $lokasi_surat }}, {{ $tanggal_surat }}</td>
+			<td colspan="5">{{ env('TEMPAT_PERSURATAN') }}, {{ date("d-m-Y") }}</td>
 		  </tr>
 		  <tr>
 			<td></td>
