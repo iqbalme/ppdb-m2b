@@ -1,2 +1,4 @@
 perintah: 
 php /home/websites/laravel/artisan schedule:run >> /dev/null 2>&1
+
+/usr/local/bin/php /home/u6592270/public_html/ppdb/artisan schedule:run >> /dev/null 2>&1

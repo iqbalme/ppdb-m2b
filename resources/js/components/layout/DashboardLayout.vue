@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <side-bar>
-      <mobile-menu slot="content"></mobile-menu>
+      <!--mobile-menu slot="content"></mobile-menu-->
       <sidebar-link to="/index">
         <!--b-icon icon="house" style="width: 30px; height: 30px;margin-right:13px"></b-icon>
         <i class="nc-icon nc-chart-pie-35"></i> -->
