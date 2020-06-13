@@ -24,6 +24,7 @@ Route::post('/hapusfile', 'funcController@hapusFile'); //hapus dokumen
 Route::get('/hapusfileberkala', 'funcController@hapusFileBerkala'); //hapus temporary files berkala setiap 2 jam
 Route::post('/updateLampiranUser', 'funcController@updateLampiranUser'); //update lampiran db user
 Route::post('/hapusLampiranUser', 'funcController@hapusLampiranUser'); //hapus lampiran db user
+Route::post('/cekpin', 'funcController@cekPin'); // cek pin untuk print
 Route::get('/agama', 'funcController@agama');
 Route::get('/hobi', 'funcController@hobi'); // get hobi
 Route::delete('/hobi/{id}', 'funcController@hapusHobi'); // hapus hobi

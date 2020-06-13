@@ -87,6 +87,7 @@ class RegistrationController extends Controller
 		$agama_wali = $request->input('agama_wali');
 		$uploadList = $request->input('uploadList');
 		$deleteList = $request->input('deleteList');
+		$peminatan = $request->input('peminatan');
 		try{
 			// Begin the transaction
 			DB::beginTransaction();
@@ -115,7 +116,7 @@ class RegistrationController extends Controller
 				$tahun_ajaran_pendaftar = ['tahun_ajaran_id' => $tahun_ajaran_aktif];
 				$pendaftar->tahun_ajaran_pendaftar()->create($tahun_ajaran_pendaftar);
 			}
-			$data_pendaftar = DataPendaftar::where(['pendaftar_id' => $request->input('id')])->first();
+			//$data_pendaftar = DataPendaftar::where(['pendaftar_id' => $pendaftar->id])->first();
 			$detail_data_pendaftar = [
 				'no_peserta_un' => $no_peserta_un,
 				'total_nilai_un' => $total_nilai_un,
@@ -155,10 +156,10 @@ class RegistrationController extends Controller
 				'agama_ibu_id' => $agama_ibu,
 				'agama_wali_id' => $agama_wali
 			];
-			$data_pendaftar->fill($detail_data_pendaftar);
-			if($data_pendaftar->isDirty()){
-				$data_pendaftar->fill($detail_data_pendaftar)->save();
-			}
+			$pendaftar->data_pendaftar()->updateOrCreate(['pendaftar_id' => $pendaftar->id], $detail_data_pendaftar);
+			// if($data_pendaftar->isDirty()){
+				// $pendaftar->data_pendaftar()->fill($detail_data_pendaftar)->save();
+			// }
 			for($i=0;$i<count($nilai_akademik_data);$i++){
 				$data_akademik = [
 					'semester1' => $nilai_akademik_data[$i]['nilai']['semester1'],
@@ -166,18 +167,20 @@ class RegistrationController extends Controller
 					'semester3' => $nilai_akademik_data[$i]['nilai']['semester3'],
 					'semester4' => $nilai_akademik_data[$i]['nilai']['semester4'],
 					'semester5' => $nilai_akademik_data[$i]['nilai']['semester5'],
-					'keterangan' => $nilai_akademik_data[$i]['keterangan']
+					'keterangan' => $nilai_akademik_data[$i]['keterangan'] ?: ''
 				];
 				
-				if($request->input('id') == null){
-					NilaiAkademik::create($data_akademik);
-				} else {
-					$nilai_akademik = NilaiAkademik::find($nilai_akademik_data[$i]['nilai']['id']);
-					$nilai_akademik->fill($data_akademik);
-					if($nilai_akademik->isDirty()){
-						$nilai_akademik->save();
-					}
-				}
+				$pendaftar->nilai_akademik()->updateOrCreate(['mapel_id' => $nilai_akademik_data[$i]['id']], $data_akademik);
+				
+				// if($request->input('id') == null){
+					// NilaiAkademik::create($data_akademik);
+				// } else {
+					// $nilai_akademik = NilaiAkademik::find($nilai_akademik_data[$i]['nilai']['id']);
+					// $nilai_akademik->fill($data_akademik);
+					// if($nilai_akademik->isDirty()){
+						// $nilai_akademik->save();
+					// }
+				// }
 			}
 			for($i=0;$i<count($prestasi_non_akademik_data);$i++){
 				$data_prestasi = [
@@ -216,6 +219,9 @@ class RegistrationController extends Controller
 			for($i=0;$i<count($deleteList);$i++){
 				$filetempdelete = str_replace('storage', 'public', $deleteList[$i]);
 				Lampiran::where('path', $filetempdelete)->delete();
+			}
+			for($i=0;$i<count($peminatan);$i++){
+				$pendaftar->peminatan_siswa()->updateOrCreate(['peminatan_id' => $peminatan[$i]['id']]);
 			}
 			if($request->input('id') == null){
 				$status_pendaftar = new StatusPendaftar;
@@ -336,16 +342,16 @@ class RegistrationController extends Controller
 		if($response['status'] = 'success'){
 			$data = $response['data'];
 			try{
-				$data_surat = [
-					'lokasi_surat' => env('TEMPAT_PERSURATAN'),
-					'tanggal_surat' => date("d-m-Y"),
-					'nama_kepala' => env('NAMA_KEPALA_SEKOLAH'),
-					'nip_kepala' => env('NIP_KEPALA_SEKOLAH')
-				];
-				$new_data = array_merge($data->toArray(), $data_surat);
-				$surat_pernyataan_siswa = $this->suratPernyataanSiswa($new_data);
-				$surat_pernyataan_wali = $this->suratPernyataanWali($new_data);
-				$kartu_registrasi = $this->kartuRegistrasi($new_data);
+				// $data_surat = [
+					// 'lokasi_surat' => env('TEMPAT_PERSURATAN'),
+					// 'tanggal_surat' => date("d-m-Y"),
+					// 'nama_kepala' => env('NAMA_KEPALA_SEKOLAH'),
+					// 'nip_kepala' => env('NIP_KEPALA_SEKOLAH')
+				// ];
+				// $new_data = array_merge_recursive($data->toArray(), $data_surat);
+				$surat_pernyataan_siswa = $this->suratPernyataanSiswa($data);
+				$surat_pernyataan_wali = $this->suratPernyataanWali($data);
+				$kartu_registrasi = $this->kartuRegistrasi($data);
 				if(($surat_pernyataan_siswa == 'success') && ($surat_pernyataan_wali == 'success') && ($kartu_registrasi == 'success')){
 					$attachments = [
 						$this->prefix_path.'Kartu_Registrasi_No_'.$data["status_pendaftar"]["noRegistrasi"].'.pdf',
@@ -382,7 +388,14 @@ class RegistrationController extends Controller
 			if($status_pendaftar->count()>0){
 				$id_pendaftar = $status_pendaftar->first()->pendaftar_id;
 				$data = Pendaftar::where('id', $id_pendaftar)->with(['data_pendaftar','data_pendaftar.hubungan','data_pendaftar.jenis_tinggal','data_pendaftar.jarak','data_pendaftar.transportasi','data_pendaftar.penghasilan','data_pendaftar.pekerjaan_ayah','data_pendaftar.pendidikan_ayah','data_pendaftar.pekerjaan_ibu','data_pendaftar.pendidikan_ibu','data_pendaftar.pekerjaan_wali','data_pendaftar.pendidikan_wali','data_pendaftar.agama_ayah','data_pendaftar.agama_ibu','data_pendaftar.agama_wali','agama','hobi','cita_cita','status_pendaftar','pendaftar_kelas.kelas','nilai_akademik','nilai_akademik.mapel','prestasi_non_akademik','lampiran','peminatan'])->first();
-				$response = ['status' => 'success', 'data' => $data];
+				$data_surat = [
+					'lokasi_surat' => env('TEMPAT_PERSURATAN'),
+					'tanggal_surat' => date("d-m-Y"),
+					'nama_kepala' => env('NAMA_KEPALA_SEKOLAH'),
+					'nip_kepala' => env('NIP_KEPALA_SEKOLAH')
+				];
+				$new_data = array_merge_recursive($data->toArray(), $data_surat);
+				$response = ['status' => 'success', 'data' => $new_data];
 			} else {
 				$response = ['status' => 'error'];
 			}			

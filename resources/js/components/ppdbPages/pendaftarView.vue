@@ -11,7 +11,13 @@
 					</div>
 					<div class="row" v-show="loading">
 						<div class="col-md-12 text-center">
-							<b-alert variant="info" show>Loading ...</b-alert>
+							<br>
+						</div>
+					</div>
+					<div class="row" v-show="loading">
+						<div class="col-md-12 text-center">
+							<b-alert variant="info" show>Loading ... Harap tunggu<br>
+							Sedang mempersiapkan dokumen registrasi</b-alert>
 						</div>
 					</div>
 					<div v-show="!loading">
@@ -35,28 +41,29 @@
 								<b-button variant="danger" class="btn-block btn-fill" @click="makeDokumenPendaftar()">REFRESH</b-button>
 							</div>
 						</div>
-						<div  v-if="!loading && !failed && isAuth">
+						<div  v-if="!loading && !failed">
 						<div class="row">
-							<div class="col-md-2">
+							<div class="col-md-10 offset-md-1" v-if="!isAuth">
 								<base-input type="text" label="Masukkan PIN" v-model="pin" :validatedClass="$v.pin.$error"maxlength="5"></base-input>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-10 offset-md-1 text-center mb-3">
-								<b-button variant="danger" class="btn-block btn-fill" @click="forceFileDownload('kartu_reg')">CETAK KARTU REGISTRASI</b-button>
+								<b-button variant="danger" class="btn-block btn-fill" @click="forceFileDownload('kartu_reg')" :disabled="(!isAuth && pin==null) || (!isAuth && pin == '')">CETAK KARTU REGISTRASI</b-button>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-10 offset-md-1 text-center mb-3">
-								<b-button variant="secondary" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_siswa')">CETAK SURAT PERNYATAAN SISWA</b-button>
+								<b-button variant="secondary" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_siswa')" :disabled="(!isAuth && pin==null) || (!isAuth && pin == '')">CETAK SURAT PERNYATAAN SISWA</b-button>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-md-10 offset-md-1 text-center mb-3">
-								<b-button variant="warning" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_wali')">CETAK SURAT PERNYATAAN WALI</b-button>
+								<b-button variant="warning" class="btn-block btn-fill" @click="forceFileDownload('surat_pernyataan_wali')" :disabled="(!isAuth && pin==null) || (!isAuth && pin == '')">CETAK SURAT PERNYATAAN WALI</b-button>
 							</div>
 						</div>
 						</div>
+						
 						</div>
                 </card>
             </div>
@@ -70,6 +77,7 @@ import Card from "./../themeComponents/Cards/Card.vue";
 import $axios from '../../api.js';
 import Swal from 'sweetalert2';
 import { mapGetters } from 'vuex';
+import { requiredIf } from 'vuelidate/lib/validators';
 
 export default {
     components: {
@@ -84,6 +92,13 @@ export default {
 			pin: null
 		}
     },
+	validations() {
+		return {
+			pin: {
+				requiredIf: requiredIf(function() { return !this.isAuth })
+			}
+		}
+	},
 	filters: {
 		upper(value){
 			if(!value) return ''
@@ -104,6 +119,19 @@ export default {
 	},
     methods: {
 		forceFileDownload(tipe){
+			if(this.isAuth){
+				this.generateDocs(tipe);
+			} else {
+				if(this.pin == null){
+					this.$v.$touch();
+					this.modalBox('Gagal', 'Masukkan PIN untuk melanjutkan!', 'warning');
+				} else {
+					this.$v.$reset();
+					this.cekPin(tipe);
+				}				
+			}
+		},
+		generateDocs(tipe){
 			var kartu_reg = 'Kartu_Registrasi_No_' + this.no_reg;
 			var surat_pernyataan_siswa = 'Surat_Pernyataan_Siswa_NoRegistrasi_' + this.no_reg;
 			var surat_pernyataan_wali = 'Surat_Pernyataan_Wali_NoRegistrasi_' + this.no_reg;
@@ -140,14 +168,34 @@ export default {
 				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
 			});
 		},
+		cekPin(tipe) {
+			this.loading = true;
+		  $axios
+			.post('/cekpin', {'no_registrasi': this.no_reg, 'pin': this.pin})
+			.then((response)=> {
+				this.loading = false;
+			  var res = response.data;
+				if(res.status=='success'){
+					this.generateDocs(tipe);
+				} else {
+					this.modalBox('Gagal', 'PIN Salah, silahkan coba lagi!', 'warning');
+					this.pin = null;
+				}
+			})
+			.catch(error => {
+				this.loading = false;
+				this.modalBox('Gagal', 'Gagal validasi PIN. Silakan coba lagi!', 'warning');
+			});
+		},
 		getInfoPendaftar() {
+			this.loading = true;
 		  $axios
 			.post('/cekpendaftar', {no_registrasi: this.no_reg})
 			.then((response)=> {
+			this.loading = false;
 			  var res = response.data;
 				if(res.status=='success'){
 					this.nama = res.data;
-					this.loading = false;
 					this.makeDokumenPendaftar();
 				} else {
 					this.modalBox('Gagal', 'Data tidak terdaftar!', 'warning');
@@ -155,7 +203,9 @@ export default {
 				}
 			})
 			.catch(error => {
-			  this.modalBox('Gagal', 'Gagal update kelas. Silakan coba lagi!', 'warning');
+				this.loading = false;
+				this.modalBox('Gagal', 'Gagal mendapatkan data. Silakan coba lagi!', 'warning');
+				this.$router.push({name: 'pendaftarView'});
 			});
 		},
 		modalBox(header, msg, icon){

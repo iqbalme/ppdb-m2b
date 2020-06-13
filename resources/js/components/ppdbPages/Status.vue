@@ -24,7 +24,24 @@
 					</card>
 				</div>
 			</div>
-				
+			<div class="row">
+				<div class="col-md-8 offset-md-2">
+					<div class="alert alert-warning" style="font-size:1.5rem;font-weight:bold">
+						Keterangan:<br>
+						<ul>
+							<li>
+								<b-badge variant="secondary">Online</b-badge>&nbsp;Selesai Pendaftaran Online</li>
+							<li>
+								<b-badge variant="primary">Verifikasi</b-badge>&nbsp;Telah Melakukan Pendaftaran Ulang di Sekolah</li>
+							<li>
+								<b-badge variant="success">Lulus</b-badge>&nbsp;Telah Dinyatakan Lulus</li>
+							<li>
+								<b-badge variant="danger">Tidak Lulus</b-badge>&nbsp;Telah Dinyatakan Tidak Lulus
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			
 			<div class="alert alert-danger text-center" style="font-size:1.5rem;font-weight:bold" v-if="(hasil_pencarian.length==0) && search">
 				Tidak ada data

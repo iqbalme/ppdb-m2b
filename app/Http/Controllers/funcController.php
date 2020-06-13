@@ -107,6 +107,15 @@ class funcController extends Controller
 		}		
 	}
 	
+	public function cekPin(Request $request){
+		$pin = StatusPendaftar::where(['noRegistrasi' => $request->input('no_registrasi'), 'pin' => $request->input('pin')]);
+		if($pin->count()>0){
+			return response()->json(["status" => "success"]);
+		} else {
+			return response()->json(["status" => "error"]);
+		}
+	}
+	
 	public function hapusFileBerkala(Request $request){ // toleransi waktu hapus 15 jam
 		try{
 			$prefix_path = 'public/temporary/';

@@ -44,6 +44,12 @@
 			</div>
 			</div>
 			<div class="row">
+			<div class="col-md-2">
+				<div class="form-group">
+					<label class="control-label">Jenis Kelamin</label>
+					<b-form-select v-model="siswa.jenis_kelamin" :options="options.list_jenis_kelamin" :class="{'is-invalid': $v.siswa.jenis_kelamin.$error}" @click.native="getHobi"></b-form-select>
+				</div>
+			</div>
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Hobi</label>
@@ -419,7 +425,9 @@ export default {
 				  
 				})
 				.catch(error => {
-					this.getPropinsi();
+					if(this.options.list_propinsi.length>0){
+						this.getPropinsi();
+					}
 				  //console.log(error);
 				});
 			}
@@ -440,7 +448,9 @@ export default {
 			  
 			})
 			.catch(error => {
-				this.getKabupaten();
+				if(this.options.list_kabupaten.length>0){
+					this.getKabupaten();
+				}
 			  //console.log(error);
 			});
 		},
@@ -460,7 +470,9 @@ export default {
 			  
 			})
 			.catch(error => {
-				this.getKecamatan();
+				if(this.options.list_kecamatan.length>0){
+					this.getKecamatan();
+				}				
 			  //console.log(error);
 			});
 		},
@@ -480,7 +492,9 @@ export default {
 				  
 				})
 				.catch(error => {
-					this.getKelurahan();
+					if(this.options.list_kelurahan.length>0){
+						this.getKelurahan();
+					}
 				  //console.log(error);
 				});
 			}
@@ -502,7 +516,9 @@ export default {
 				  
 				})
 				.catch(error => {
-					this.getJenisTinggal();
+					if(this.options.list_jenis_tinggal.length>0){
+						this.getJenisTinggal();
+					}
 				  //console.log(error);
 				});
 			}

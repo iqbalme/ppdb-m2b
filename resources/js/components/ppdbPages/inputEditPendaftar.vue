@@ -132,7 +132,6 @@ export default {
 				this.validateStep('step4'),
 				this.validateStep('step5')
 			]);
-			console.log(result);
 			for(var i=0;i<result.length;i++){
 				if(result[i]!=true){
 					error++;

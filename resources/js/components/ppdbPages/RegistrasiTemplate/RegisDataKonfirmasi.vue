@@ -41,6 +41,18 @@
 				</b-table>
 			</div>
 		</div>
+		<div class="row" v-if="$v.dokumen.peminatan.$error">
+			<div class="col-md-12">
+				<b-alert show variant="danger">Wajib memilih minimal 1 peminatan</b-alert>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-info" style="font-size:1.5rem;font-weight:bold">
+					Foto
+				</div>
+			</div>
+		</div>
 		<div class="row" v-if="dokumen.fileFoto.url == null">
 			<div class="col-md-12">
 				<div class="form-group">
@@ -189,7 +201,7 @@
 
 <script>
 
-import { required, requiredIf, sameAs, email} from 'vuelidate/lib/validators';
+import { required, requiredIf, sameAs, email, minLength, maxLength } from 'vuelidate/lib/validators';
 import Card from "./../../themeComponents/Cards/Card.vue";
 import Swal from 'sweetalert2';
 import $axios from '../../../api.js';
@@ -258,7 +270,8 @@ export default {
 					}				
 				},
 				peminatan: {
-					
+					required,
+					maxLength: maxLength(2)
 				}
 			},
 			persetujuan : {
@@ -276,7 +289,6 @@ export default {
 		...mapGetters(['isAuth']),
 		isFileLampiran(){
 			return this.lampiran.file_lampiran != null
-			
 		},
 		comp_fileFoto(){
 			if(this.isEdit){
@@ -289,7 +301,7 @@ export default {
 			return (this.dokumen.uploadList.length > 0);
 		},
 		comp_peminatan(){
-			return (this.dokumen.peminatan.length >= 2);
+			return (this.temp_peminatan == null) || (this.dokumen.peminatan.length >= 2);
 		}
 	},
 	watch: {
@@ -325,8 +337,8 @@ export default {
 			this.dokumen.peminatan.splice(value,1);
 		},
 		comp_setuju(val){
-			if(this.isEdit){
-				return (val != 'setuju') || (val == 'setuju');
+			if(this.isAuth){
+				return true
 			} else {
 				return (val == 'setuju');
 			}

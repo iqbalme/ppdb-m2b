@@ -168,7 +168,7 @@
 		this.getValidated();
 		this.getLulus();
 		this.getVisitors();
-		this.getSetting();
+		//this.getSetting();
 		//this.getPageViews();
 		//this.getBrowser();
 		// this.barChart.data.series[0].push(15);

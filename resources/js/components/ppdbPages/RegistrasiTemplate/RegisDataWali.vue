@@ -114,13 +114,15 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<div class="alert alert-warning pl-15 pr-15">
-						<b-form-checkbox v-model="wali_is_ayah" value="true" unchecked-value="false" :disabled="ayah_is_almarhum">
-							<strong>Centang jika wali adalah Ayah</strong>
-						</b-form-checkbox>
-						<b-form-checkbox v-model="wali_is_ibu" value="true" unchecked-value="false" :disabled="ibu_is_almarhum">
-							<strong>Centang jika wali adalah Ibu</strong>
-						</b-form-checkbox>
+				<div class="alert alert-secondary pl-15 pr-15">
+					<div class="">
+						<div class="form-group">
+							<label class="control-label">
+								Hubungan dengan Wali
+							</label>
+							<b-form-select v-model="wali.hubungan_dengan_wali" :options="options.list_hubungan" :class="{'is-invalid': $v.wali.hubungan_dengan_wali.$error}" @click.native="getHubungan"></b-form-select>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -142,21 +144,13 @@
 				<base-input type="text" label="NIK Wali" v-model="wali.nik_wali" :validatedClass="$v.wali.nik_wali.$error" maxLength="16":disabled="disableWaliGrup"></base-input>
 			</div>
 		<div class="col-md-5">
-			<div class="form-group">
-				<label class="control-label">
-					Hubungan dengan Wali
-				</label>
-				<b-form-select v-model="wali.hubungan_dengan_wali" :options="options.list_hubungan" :class="{'is-invalid': $v.wali.hubungan_dengan_wali.$error}" :disabled="disableWaliGrup" @click.native="getHubungan"></b-form-select>
-			</div>
-		</div>
-		</div>
-		<div class="row">
-			<div class="col-md-4">
-			<div class="form-group">
-				<label class="control-label">Agama Wali</label>
-				<b-form-select v-model="wali.agama_wali" :options="options.list_agama" :class="{'is-invalid': $v.wali.agama_wali.$error}" @click.native="getAgama" :disabled="disableWaliGrup"></b-form-select>
+				<div class="form-group">
+					<label class="control-label">Agama Wali</label>
+					<b-form-select v-model="wali.agama_wali" :options="options.list_agama" :class="{'is-invalid': $v.wali.agama_wali.$error}" @click.native="getAgama" :disabled="disableWaliGrup"></b-form-select>
 				</div>
 			</div>
+		</div>
+		<div class="row">	
 			<div class="col-md-4">
 			<div class="form-group">
 				<label class="control-label">Pekerjaan Wali</label>
@@ -169,9 +163,7 @@
 				<b-form-select v-model="wali.pendidikan_wali" :options="options.list_pendidikan" :class="{'is-invalid': $v.wali.pendidikan_wali.$error}" :disabled="disableWaliGrup"  @click.native="getPendidikan"></b-form-select>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-4">
 				<base-input type="text" label="No HP Wali" v-model="wali.no_hp_wali" :validatedClass="$v.wali.no_hp_wali.$error" :disabled="disableWaliGrup" maxLength="16"></base-input>
 			</div>
 		</div>
@@ -230,11 +222,11 @@ export default {
 				agama_ibu: null,
 				agama_wali: null
             },
-			ayah_is_almarhum: false,
-			ibu_is_almarhum: false,
 			disableWaliGrup: false,
-			wali_is_ayah : 'false',
-			wali_is_ibu : 'false',
+			wali_is_ayah : false,
+			wali_is_ibu : false,
+			ayah_is_almarhum : false,
+			ibu_is_almarhum : false,
 			options: {
 				list_pekerjaan: [],
 				list_pendidikan: [],
@@ -309,135 +301,121 @@ export default {
 		
 	},
 	watch: {
-		wali_is_ayah: function(val){
-			if(val=='true'){
-				if(this.wali_is_ibu=='true'){
-					this.wali_is_ibu='false';
-				}
-				this.wali.nama_lengkap_wali = this.wali.nama_ayah;
-				this.wali.nik_wali = this.wali.nik_ayah;
-				this.wali.hubungan_dengan_wali = "1";
-				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
-				this.wali.pendidikan_wali = this.wali.pendidikan_ayah;
-				this.wali.no_hp_wali = this.wali.no_hp_ayah;
-				this.wali.agama_wali = this.wali.agama_ayah;
-				this.disableWaliGrup = true;
-			} else {
-				if(this.wali_is_ibu=='false'){
-					this.resetWaliElement();
-					this.disableWaliGrup = false;
-				}
-			}			
-		},
-		wali_is_ibu: function(val){
-			if(val=='true'){
-				if(this.wali_is_ayah=='true'){
-					this.wali_is_ayah='false';
-				}
-				this.wali.nama_lengkap_wali = this.wali.nama_ibu;
-				this.wali.nik_wali = this.wali.nik_ibu;
-				this.wali.hubungan_dengan_wali = "2";
-				this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;
-				this.wali.pendidikan_wali = this.wali.pendidikan_ibu;
-				this.wali.no_hp_wali = this.wali.no_hp_ibu;
-				this.wali.agama_wali = this.wali.agama_ibu;
-				this.disableWaliGrup = true;
-			} else {
-				if(this.wali_is_ayah=='false'){
-					this.resetWaliElement();
-					this.disableWaliGrup = false;
-				}
-			}
-		},
 		comp_nama_ayah(){
-			if(this.wali_is_ayah=='true'){
+			if(this.wali_is_ayah){
 				this.wali.nama_lengkap_wali = this.wali.nama_ayah;
 			}
 		},
 		comp_nik_ayah(){
-			if(this.wali_is_ayah=='true'){
+			if(this.wali_is_ayah){
 				this.wali.nik_wali = this.wali.nik_ayah;
 			}
 		},
 		comp_pekerjaan_ayah(){
 			if(this.options.list_pekerjaan.length>0){
 				var index = this.getIndexPekerjaan('Almarhum');
+				console.log('index ayah ' + this.getIndexHubungan('Ayah'));
 				if(this.wali.pekerjaan_ayah == this.options.list_pekerjaan[index].value){
-					this.ayah_is_almarhum = true
+					this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = true
 					this.wali.nik_ayah = ''
 					this.wali.no_hp_ayah = ''
-					this.wali_is_ayah='false'
+					this.wali_is_ayah = false
+					this.ayah_is_almarhum = true;
 					this.resetWaliElement()
 				} else {
-					this.ayah_is_almarhum = false
+					this.ayah_is_almarhum = false;
+					this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = false
+					if(this.wali_is_ayah){
+						this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah
+					}
 				}					
-			}
-			if((this.wali_is_ayah=='true') && (this.ayah_is_almarhum==false)){
-				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
 			}
 		},
 		comp_pendidikan_ayah(){
-			if(this.wali_is_ayah=='true'){
+			if(this.wali_is_ayah){
 				this.wali.pendidikan_wali = this.wali.pendidikan_ayah;
 			}
 		},
 		comp_agama_ayah(){
-			if(this.wali_is_ayah=='true'){
+			if(this.wali_is_ayah){
 				this.wali.agama_wali = this.wali.agama_ayah;
 			}
 		},
 		comp_no_hp_ayah(){
-			if(this.wali_is_ayah=='true'){
+			if(this.wali_is_ayah){
 				this.wali.no_hp_wali = this.wali.no_hp_ayah;
 			}
 		},
 		comp_nama_ibu(){
-			if(this.wali_is_ibu=='true'){
+			if(this.wali_is_ibu){
 				this.wali.nama_lengkap_wali = this.wali.nama_ibu;
 			}
 		},
 		comp_nik_ibu(){
-			if(this.wali_is_ibu=='true'){
+			if(this.wali_is_ibu){
 				this.wali.nik_wali = this.wali.nik_ibu;
 			}
 		},
 		comp_pekerjaan_ibu(){
 			if(this.options.list_pekerjaan.length>0){
-				var index = this.getIndexPekerjaan('Pensiunan/Almarhum');
+				var index = this.getIndexPekerjaan('Almarhum');
 				if (this.wali.pekerjaan_ibu == this.options.list_pekerjaan[index].value){
-					this.ibu_is_almarhum = true
+					this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = true
 					this.wali.nik_ibu=''
 					this.wali.no_hp_ibu=''
-					this.wali_is_ibu='false'
+					this.wali_is_ibu=false
+					this.ibu_is_almarhum = true
 					this.resetWaliElement()
 				} else {
 					this.ibu_is_almarhum = false
-				}
-				if((this.wali_is_ibu=='true') &&(this.ibu_is_almarhum==false)){
-					this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;
+					this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = false;
+					if(this.wali_is_ibu){
+						this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu
+					}
 				}
 			}
 		},
 		comp_pendidikan_ibu(){
-			if(this.wali_is_ibu=='true'){
+			if(this.wali_is_ibu){
 				this.wali.pendidikan_wali = this.wali.pendidikan_ibu;
 			}
 		},
 		comp_agama_ibu(){
-			if(this.wali_is_ibu=='true'){
+			if(this.wali_is_ibu){
 				this.wali.agama_wali = this.wali.agama_ibu;
 			}
 		},
 		comp_no_hp_ibu(){
-			if(this.wali_is_ibu=='true'){
+			if(this.wali_is_ibu){
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
 			}
 		},
 		comp_hubungan_wali(){
-			if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ayah')){
+			if(this.wali.hubungan_dengan_wali==this.options.list_hubungan[this.getIndexHubungan('Ayah')].value){
+				this.wali.nama_lengkap_wali = this.wali.nama_ayah;
+				this.wali.nik_wali = this.wali.nik_ayah;
+				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
+				this.wali.pendidikan_wali = this.wali.pendidikan_ayah;
+				this.wali.no_hp_wali = this.wali.no_hp_ayah;
+				this.wali.agama_wali = this.wali.agama_ayah;
 				this.wali_is_ayah = true;
-			} else if(this.wali.hubungan_dengan_wali==this.getIndexHubungan('Ibu')){
+				this.wali_is_ibu = false;
+				this.disableWaliGrup = true;
+			} else if(this.wali.hubungan_dengan_wali==this.options.list_hubungan[this.getIndexHubungan('Ibu')].value){
+				this.wali.nama_lengkap_wali = this.wali.nama_ibu;
+				this.wali.nik_wali = this.wali.nik_ibu;
+				this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;
+				this.wali.pendidikan_wali = this.wali.pendidikan_ibu;
+				this.wali.no_hp_wali = this.wali.no_hp_ibu;
+				this.wali.agama_wali = this.wali.agama_ibu;
 				this.wali_is_ibu = true;
+				this.wali_is_ayah = false;
+				this.disableWaliGrup = true;
+			} else {
+				this.wali_is_ibu = false;
+				this.wali_is_ayah = false;
+				this.resetWaliElement();
+				this.disableWaliGrup = false;
 			}
 		}
 	},
@@ -584,7 +562,8 @@ export default {
 				  for (var i = 0; i < items.length; i++) {
 					this.options.list_hubungan.push({
 						value : items[i].id,
-						text: items[i].hubungan
+						text: items[i].hubungan,
+						disabled: false
 					});
 				  }
 				})
@@ -600,7 +579,7 @@ export default {
 		},
 		getIndexHubungan(val){
 			if(this.options.list_hubungan.length>0){
-				var index = this.options.list_hubungan[this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true)].value;
+				var index = this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true);
 				return index;
 			}			
 		},
