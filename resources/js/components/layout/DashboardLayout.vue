@@ -53,7 +53,6 @@
   import TopNavbar from './TopNavbar.vue'
   import ContentFooter from './ContentFooter.vue'
   import DashboardContent from './Content.vue'
-  import MobileMenu from './MobileMenu.vue'
   import Counter from '../ppdbPages/Counter.vue'
   import { mapState, mapGetters } from 'vuex'
   //import moment from 'moment'
@@ -65,7 +64,6 @@
       TopNavbar,
       ContentFooter,
       DashboardContent,
-      MobileMenu,
 	  Counter
     },
 	computed: {
