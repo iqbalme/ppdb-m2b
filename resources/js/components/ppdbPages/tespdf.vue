@@ -14,7 +14,7 @@
 						<p class="lokasi text-center">Jl. Matahari No. 21 Bulukumba, Telp 0413-81118</p>
 					</div>
 					<div class="col-md-2">
-						<img src="http://ppdb.ccom/uploads/m2b.png" class="img_logo">
+						<img src="https://ppdb.man2bulukumba.sch.id/uploads/m2b.png" class="img_logo">
 					</div>
 				</div>
 			</div>

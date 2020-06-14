@@ -7,7 +7,7 @@
 						<b-jumbotron bg-variant="info" text-variant="white" border-variant="info">
 							<template v-slot:header>
 								<div class="text-center mb-5">
-									<img src="http://ppdb.ccom/uploads/m2b.png" class="xlogo">
+									<img src="https://ppdb.man2bulukumba.sch.id/uploads/m2b.png" class="xlogo">
 								</div>
 								<div class="text-center">
 									TIDAK AKTIF
