@@ -223,6 +223,7 @@ export default {
 				agama_wali: null
             },
 			disableWaliGrup: false,
+			hubungan_index: [],
 			wali_is_ayah : false,
 			wali_is_ibu : false,
 			ayah_is_almarhum : false,
@@ -232,7 +233,8 @@ export default {
 				list_pendidikan: [],
 				list_penghasilan: [],
 				list_hubungan: [],
-				list_agama: []
+				list_agama: [],
+				almarhumIndex: null
 			}
         };
     },
@@ -297,9 +299,6 @@ export default {
 		this.getPenghasilan();
 		this.getHubungan();	
 	},
-	beforeUpdate(){
-		
-	},
 	watch: {
 		comp_nama_ayah(){
 			if(this.wali_is_ayah){
@@ -311,23 +310,22 @@ export default {
 				this.wali.nik_wali = this.wali.nik_ayah;
 			}
 		},
-		comp_pekerjaan_ayah(){
+		comp_pekerjaan_ayah(val){
 			if(this.options.list_pekerjaan.length>0){
-				var index = this.getIndexPekerjaan('Almarhum');
-				if(this.wali.pekerjaan_ayah == this.options.list_pekerjaan[index].value){
-					this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = true
+				var index = this.options.almarhumIndex;
+				if(val == this.options.list_pekerjaan[index].value){
+					this.options.list_hubungan[this.hubungan_index[0]].disabled = true
 					this.wali.nik_ayah = ''
 					this.wali.no_hp_ayah = ''
 					this.wali_is_ayah = false
-					this.ayah_is_almarhum = true;
+					this.ayah_is_almarhum = true
 					this.resetWaliElement()
+					this.wali.hubungan_dengan_wali = null
 				} else {
+					this.options.list_hubungan[this.hubungan_index[0]].disabled = false
 					this.ayah_is_almarhum = false;
-					if(this.getIndexHubungan('Ayah')!== undefined){
-						this.options.list_hubungan[this.getIndexHubungan('Ayah')].disabled = false
-					}
 					if(this.wali_is_ayah){
-						this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah
+						this.wali.pekerjaan_wali = val
 					}
 				}					
 			}
@@ -357,23 +355,22 @@ export default {
 				this.wali.nik_wali = this.wali.nik_ibu;
 			}
 		},
-		comp_pekerjaan_ibu(){
+		comp_pekerjaan_ibu(val){
 			if(this.options.list_pekerjaan.length>0){
-				var index = this.getIndexPekerjaan('Almarhum');
-				if (this.wali.pekerjaan_ibu == this.options.list_pekerjaan[index].value){
-					this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = true
+				var index = this.options.almarhumIndex;
+				if (val == this.options.list_pekerjaan[index].value){
+					this.options.list_hubungan[this.hubungan_index[1]].disabled = true
 					this.wali.nik_ibu=''
 					this.wali.no_hp_ibu=''
 					this.wali_is_ibu=false
 					this.ibu_is_almarhum = true
 					this.resetWaliElement()
+					this.wali.hubungan_dengan_wali = null
 				} else {
-					this.ibu_is_almarhum = false
-					if(this.getIndexHubungan('Ibu')!== undefined){
-						this.options.list_hubungan[this.getIndexHubungan('Ibu')].disabled = false;
-					}					
+					this.options.list_hubungan[this.hubungan_index[1]].disabled = false
+					this.ibu_is_almarhum = false		
 					if(this.wali_is_ibu){
-						this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu
+						this.wali.pekerjaan_wali = val
 					}
 				}
 			}
@@ -393,8 +390,9 @@ export default {
 				this.wali.no_hp_wali = this.wali.no_hp_ibu;
 			}
 		},
-		comp_hubungan_wali(){
-			if(this.wali.hubungan_dengan_wali==this.options.list_hubungan[this.getIndexHubungan('Ayah')].value){
+		comp_hubungan_wali(val){
+			if(val==this.options.list_hubungan[this.hubungan_index[0]].value){ //jika 'Ayah' yg dipilih
+				console.log('ayah');
 				this.wali.nama_lengkap_wali = this.wali.nama_ayah;
 				this.wali.nik_wali = this.wali.nik_ayah;
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
@@ -404,7 +402,8 @@ export default {
 				this.wali_is_ayah = true;
 				this.wali_is_ibu = false;
 				this.disableWaliGrup = true;
-			} else if(this.wali.hubungan_dengan_wali==this.options.list_hubungan[this.getIndexHubungan('Ibu')].value){
+			} else if(val==this.options.list_hubungan[this.hubungan_index[1]].value){ //jika 'Ibu' yg dipilih
+				console.log('ibu');
 				this.wali.nama_lengkap_wali = this.wali.nama_ibu;
 				this.wali.nik_wali = this.wali.nik_ibu;
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;
@@ -506,6 +505,9 @@ export default {
 				  var items = response.data;
 				  this.options.list_pekerjaan = [];
 				  for (var i = 0; i < items.length; i++) {
+					  if((items[i].pekerjaan).toLowerCase().includes('almarhum')){
+						  this.$set(this.options, 'almarhumIndex', i);
+					  }
 					this.options.list_pekerjaan.push({
 						value : items[i].id,
 						text: items[i].pekerjaan
@@ -550,10 +552,16 @@ export default {
 			if(this.options.list_hubungan.length==0){
 			  $axios
 				.get('/hubungan')
-				.then((response)=> {
+				.then((response)=>{
 				  var items = response.data;
 				  this.options.list_hubungan = [];
+				  this.hubungan_index = [];
 				  for (var i = 0; i < items.length; i++) {
+					if((items[i].hubungan).toLowerCase() == 'ayah'){
+						this.hubungan_index.push(i);
+					} else if((items[i].hubungan).toLowerCase() == 'ibu'){
+						this.hubungan_index.push(i);
+					}
 					this.options.list_hubungan.push({
 						value : items[i].id,
 						text: items[i].hubungan,
@@ -563,21 +571,9 @@ export default {
 				});
 			}
 		},
-		getIndexPekerjaan(val){
-			//this.showForm = true;)
-			var index = this.options.list_pekerjaan.map(function(o){ return o.text.includes(val) }).indexOf(true);
-			return index;
-		},
-		getIndexHubungan(val){
-			if(this.options.list_hubungan.length>0){
-				var index = this.options.list_hubungan.map(function(o){ return o.text.includes(val) }).indexOf(true);
-				return index;
-			}			
-		},
 		resetWaliElement(){
 			this.wali.nama_lengkap_wali = '';
 			this.wali.nik_wali = '';
-			this.wali.hubungan_dengan_wali = null;
 			this.wali.pekerjaan_wali = null;
 			this.wali.pendidikan_wali = null;
 			this.wali.agama_wali = null;

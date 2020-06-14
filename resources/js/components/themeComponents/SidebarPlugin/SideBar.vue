@@ -61,7 +61,7 @@
       },
       backgroundImage: {
         type: String,
-        default: 'img/sidebar-5.jpg'
+        default: 'https://1.bp.blogspot.com/-i31UtuSiDIQ/XuWBDa6imDI/AAAAAAAADUA/a2yMX1z3hU0rvi_Q0ey6gSpSeD-oynEeACLcBGAsYHQ/s1600/sidebar-5.jpg'
       },
       activeColor: {
         type: String,

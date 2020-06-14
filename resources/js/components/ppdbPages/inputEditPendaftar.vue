@@ -155,13 +155,11 @@ export default {
 					this.dataForEdit = res.data;
 					this.editForm();
 				} else {
-					console.log('gagal3');
 					this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
 					//this.$router.push({name: 'Home'});
 				}
 			})
 			.catch(error => {
-				console.log('gagal4 : ' + error);
 				this.$store.commit('SET_LOADING_STATE', false);
 				this.modalBox('Gagal', 'Silakan coba lagi!', 'warning');
 				this.$router.push({name: 'Home'});
