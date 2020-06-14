@@ -12,7 +12,6 @@ import Kontak from './../components/ppdbPages/Kontak.vue'
 import successReg from './../components/ppdbPages/successReg.vue'
 import registrationTime from './../components/ppdbPages/registrationTime.vue'
 import invalidRegistration from './../components/ppdbPages/invalidRegistration.vue'
-import tespdf from './../components/ppdbPages/tespdf.vue'
 import RegisDataWali from './../components/ppdbPages/RegistrasiTemplate/RegisDataWali.vue'
 import RegisInfo from './../components/ppdbPages/RegistrasiTemplate/RegisInfo.vue';
 import EditInfo from './../components/ppdbPages/editInfo.vue';
@@ -20,7 +19,6 @@ import RegisDataDiri from './../components/ppdbPages/RegistrasiTemplate/RegisDat
 import RegisDataSekolah from './../components/ppdbPages/RegistrasiTemplate/RegisDataSekolah.vue';
 import RegisDataNilai from './../components/ppdbPages/RegistrasiTemplate/RegisDataNilai.vue';
 import RegisDataKonfirmasi from './../components/ppdbPages/RegistrasiTemplate/RegisDataKonfirmasi.vue';
-import Submit from './../components/ppdbPages/tesSubmit.vue';
 import Cetak from './../components/ppdbPages/Cetak.vue';
 import Pengaturan from './../components/ppdbPages/Pengaturan.vue';
 import inputEditPendaftar from './../components/ppdbPages/inputEditPendaftar.vue';
@@ -99,16 +97,6 @@ const routes = [
         component: pendaftarView,
 		props: true,
       },
-	  {
-        path: 'tespdf',
-        name: 'tespdf',
-        component: tespdf
-      },
-	  {
-        path: 'tessubmit',
-        name: 'Submit',
-        component: Submit
-      }
     ]
   },
   {
