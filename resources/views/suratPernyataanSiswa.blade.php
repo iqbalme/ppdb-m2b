@@ -209,8 +209,7 @@
 			<td colspan="3"></td>
 		  </tr>
 		  <tr>
-			<td colspan="9">
-				<br>
+			<td colspan="9"  style="height:7px">
 			</td>
 		  </tr>
 		  <tr>

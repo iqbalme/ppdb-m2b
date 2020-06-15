@@ -859,22 +859,6 @@
 			<td colspan="20"><br></td>
 		  </tr>
 		  <tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td colspan="7"><u>({{ env('NAMA_KEPALA_SEKOLAH') }})</u><br>NIP. {{ env('NIP_KEPALA_SEKOLAH') }}</td>
-			<td></td>
-		  </tr>
-		  <tr>
 			<td colspan="20"><br></td>
 		  </tr>
 		  <tr>
@@ -913,7 +897,7 @@
 			<td colspan="7">
 				<br>
 			</td>
-			<td colspan="4" style="text-align:right"><img src="{{ $foto_path }}" width="100px"></td>
+			<td colspan="4" style="text-align:right"><img src="{{ str_replace('public', 'storage', $foto_path) }}" width="100px"></td>
 			<td colspan="9"></td>
 		  </tr>
 		  <tr>

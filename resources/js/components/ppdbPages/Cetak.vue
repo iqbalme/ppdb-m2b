@@ -65,7 +65,11 @@ export default {
 		...mapGetters(['isAuth']) //MENGAMBIL GETTERS isAuth DARI VUEX
 	},
 	mounted(){
-		this.makeDokumenPendaftar();
+		if(this.no_reg != null){
+			this.makeDokumenPendaftar();
+		} else {
+			this.$router.push({ name: 'Home' })
+		}
 	},
     methods: {
 		forceFileDownload(tipe){
