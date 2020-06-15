@@ -392,7 +392,7 @@ export default {
 		},
 		comp_hubungan_wali(val){
 			if(val==this.options.list_hubungan[this.hubungan_index[0]].value){ //jika 'Ayah' yg dipilih
-				console.log('ayah');
+				//console.log('ayah');
 				this.wali.nama_lengkap_wali = this.wali.nama_ayah;
 				this.wali.nik_wali = this.wali.nik_ayah;
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ayah;
@@ -403,7 +403,7 @@ export default {
 				this.wali_is_ibu = false;
 				this.disableWaliGrup = true;
 			} else if(val==this.options.list_hubungan[this.hubungan_index[1]].value){ //jika 'Ibu' yg dipilih
-				console.log('ibu');
+				//console.log('ibu');
 				this.wali.nama_lengkap_wali = this.wali.nama_ibu;
 				this.wali.nik_wali = this.wali.nik_ibu;
 				this.wali.pekerjaan_wali = this.wali.pekerjaan_ibu;

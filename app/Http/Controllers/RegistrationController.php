@@ -176,7 +176,7 @@ class RegistrationController extends Controller
 					'tempat_pelaksanaan' => $prestasi_non_akademik_data[$i]['tempat_pelaksanaan'],
 					'peringkat_juara' => $prestasi_non_akademik_data[$i]['peringkat_juara']
 				];
-				$pendaftar->prestasi_non_akademik()->updateOrCreate(['id' => $prestasi_non_akademik_data[$i]['id']]);
+				$pendaftar->prestasi_non_akademik()->updateOrCreate(['id' => $prestasi_non_akademik_data[$i]['id']], $data_prestasi);
 			}
 			// cek file foto, sama atau tidak, jika tidak maka update dan hapus filenya
 			// cek file lampiran, jika bertambah atau berkurang
