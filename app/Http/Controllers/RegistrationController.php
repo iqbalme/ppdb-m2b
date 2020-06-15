@@ -178,6 +178,7 @@ class RegistrationController extends Controller
 				];
 				$pendaftar->prestasi_non_akademik()->updateOrCreate(['id' => $prestasi_non_akademik_data[$i]['id']], $data_prestasi);
 			}
+			
 			// cek file foto, sama atau tidak, jika tidak maka update dan hapus filenya
 			// cek file lampiran, jika bertambah atau berkurang
 			// semua file temporary dipindahkan jika sukses registrasi
@@ -312,11 +313,10 @@ class RegistrationController extends Controller
 			$is_sent = EmailSent::where(['pendaftar_id' => $data['id'],
 				'email' => $data['email']]);
 			if($is_sent->count() == 0){
-				$to_send = EmailToSend::updateOrCreate([
-					'pendaftar_id' => $data['id'],
-					'email' => $data['email'],
-					'data' => json_encode($data)
-				]);
+				$to_send = EmailToSend::updateOrCreate(
+					['pendaftar_id' => $data['id'], 'email' => $data['email']],
+					['data' => json_encode($data)]
+				);
 			}
 		} catch(Exception $e){
 			$this->scheduleEmailSending($data);
